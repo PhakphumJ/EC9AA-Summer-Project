@@ -51,7 +51,7 @@ replace eduyrs = 20 if educ == 125
 gen ybirth = year - age
 
 * create experience variable
-gen exp_baseline = min(age - eduyrs - 6, age - 18)
+gen exp_baseline = min(age - eduyrs -6 , age - 18)
 
 * create outlier flag
 // Calculate the 2.5th and 97.5th percentile income for each year
