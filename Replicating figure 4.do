@@ -1,4 +1,6 @@
-*** This do-file is for replicating the figure 4 in Fang and Qiu (2023). Using CPS data from (i) 1986-2012 , and (ii) 1962-2024. ***
+*** This do-file is for replicating the figure 4 in Fang and Qiu (2023). Using CPS data from (i) 1986-2013 (survey year), and (ii) 1962-2024 (survey year). ***
+** or (i) 1986 - 2012 and (ii) 1961 - 2023 (income year)
+
 
 ** Preparing the data
 clear
@@ -11,9 +13,14 @@ drop serial month cpsid asecflag hflag statecensus pernum cpsidp cpsidv asecwth
 * drop irrelevant variables (for this exercise)
 drop race marst occ ind inctot incbus incfarm inclongj oincbus oincfarm oincwage
 
+* subtract 1 from year and age (since income variable is the income earned last year)
+replace age = age - 1
+replace year = year - 1
+
 * count obs b/w 1986 - 2012
 count if year >= 1986 & year <= 2012
-* get #obs = 4,723,421. The data in replication packgage has #obs = 4,768,394
+// get #obs = 4,768,394. The data in replication packgage has #obs = 4,768,394. So, we get the exact same number.
+// If I did not subtract 1 from year and age, I would have gotten 4,723,421. 
 
 * drop those with weight <= 0 (Note: These are valid weights)
 drop if asecwt <= 0 // there are about five hundred of these.
@@ -109,3 +116,8 @@ foreach num of numlist 1(1)`n_year'{
 	replace year_rlb = `num' if d_t`num' == 1
 }
 
+* gen Deaton's time dummies.
+foreach num of numlist 3(1) `n_year' {
+	// dt* = dt-(t-1)*d2+(t-2)*d1		[see Deaton(1997, p126) equation (2.95)]
+	gen d_t`num'star=d_t`num'-(`num'-1)*d_t2+(`num'-2)*d_t1
+}
