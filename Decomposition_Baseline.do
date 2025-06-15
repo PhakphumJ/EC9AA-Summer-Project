@@ -142,9 +142,8 @@ gen profile_coh_plot = .
 gen profile_year_plot = .
 
 * 3.7 Fill In Profiles using estimated coefficients in regression. (Earning profiles are decomposed into cohort, experience, and time profile. The first difference of the profiles are the effects.)
-local n_cohort2 = `n_cohort' - 1		// number of effective coefficients for cohort
 local n_year2 = `n_year' - 2			// number of effective coefficients for year
-local n_wexp2 = `n_wexp' - 1			// number of effective coefficients for experience
+
 replace profile_wexp = 0 if _n == 1 // (since it is the base group) (_n is the row number)
 replace profile_wexp_plot = 1 if _n == 1
 replace profile_year_plot = 1 if _n == 1
@@ -166,9 +165,10 @@ foreach num of numlist 2(1)`n_cohort' { // have to start from 2 since the first 
 
 * Year Profile (Note: this step takes into account that repeated cross-section might be NOT at an yearly frequency)
 foreach num of numlist 1(1)`n_year2' {
-	replace profile_year = coef4[1,$ctrledu + `n_wexp2' + `n_cohort2' + `num'] if _n==`num' +2
+	replace profile_year = coef4[1,`n_wexp' + `n_cohort' + `num'] if _n==`num' +2
 	replace profile_year_plot = `num' + 2 if _n==`num' +2
 }
+
 gen temp_1 = . 
 foreach num of numlist 3(1)`n_year'{
 	replace temp_1 = s_y[`num'-1] - s_y[`num'-2] if _n == `num'
