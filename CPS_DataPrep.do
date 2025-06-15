@@ -90,38 +90,6 @@ foreach y of local years_list {
 // Generate the outlier flag
 gen outlier = income_bottom2_5pct + income_top2_5pct
 
-* gen exp bins
-egen wexp_group = cut(exp_baseline), at(0(5)40) // working life = 40 yrs old. Incrementing from 0 by 5 each step.
-
-* gen cohort bins
-egen byear_group = cut(ybirth), at (1870(5)2024) // the min ybirth is 1870
-
-// create dummy variables based on this. (This is only used for relabelling later on)
-tab byear_group, g(d_c) // dummies for each cohort bin (g() means generate dummies)
-local n_cohort = r(r) // store number of cohort bins
-
-// relabel cohort from 1 to the number of cohort bins (instead of the labelling by the first year of each bin)
-gen coh_rlb = .		
-foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from the first, then incrementing by 1 each time.
-	replace coh_rlb = `num' if d_c`num' == 1
-}
-
-* gen time dummy (This is only used for relabelling later on and create Deaton's time dummy)
-tab year, g(d_t) // dummies for each year
-local n_year = r(r)	
-
-// relabel year to be from 1 to n_year instead of the actual year.
-gen year_rlb = .
-foreach num of numlist 1(1)`n_year'{
-	replace year_rlb = `num' if d_t`num' == 1
-}
-
-* gen Deaton's time variables.
-foreach num of numlist 3(1) `n_year' {
-	// dt* = dt-(t-1)*d2+(t-2)*d1		[see Deaton(1997, p126) equation (2.95)]
-	gen d_t`num'star=d_t`num'-(`num'-1)*d_t2+(`num'-2)*d_t1
-}
-
 * Use only male workers
 keep if sex == 1
 

@@ -1,4 +1,4 @@
-*** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4)
+*** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4) ***
 
 clear
 cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data"
@@ -9,7 +9,54 @@ use "CPS_Cleaned.dta"
 keep if year >= 1986 & year <= 2012
 keep if ybirth >= 1935 & ybirth <= 1984
 
+* gen exp bins
+egen wexp_group = cut(exp_baseline), at(0(5)40) // working life = 40 yrs old. Incrementing from 0 by 5 each step.
+
 drop if wexp_group == . // use only those in interested experience groups (no negative experience or over 40 years)
+
+* gen cohort bins (from [the minimum ybirth rounded to a multiple of 5] to [the maximum of ybirth rounded to be multiple of 5]) (e.g. from 1870 t0 2024)
+sum ybirth
+local min_ybirth = r(min)
+display "The minimum of ybirth is: `min_ybirth'"
+local max_ybirth = r(max)
+display "The maximum of ybirth is: `max_ybirth'"
+
+// Rounding up and down
+local rounded_min_ybirth = floor(`min_ybirth' / 5) * 5
+local rounded_up_max_ybirth = ceil(`max_ybirth' / 5) * 5
+
+display "The rounded downed minimum to a multiple of 5 is: `min_ybirth'"
+display "The rounded up maximum to a multiple of 5 is: `rounded_up_max_ybirth'"
+
+// Gen the birth year group variable
+egen byear_group = cut(ybirth), at (`rounded_min_ybirth'(5)`rounded_up_max_ybirth')
+
+// create dummy variables based on this. (This is only used for relabelling later on)
+tab byear_group, g(d_c) // dummies for each cohort bin (g() means generate dummies)
+local n_cohort = r(r) // store number of cohort bins
+
+// relabel cohort from 1 to the number of cohort bins (instead of the labelling by the first year of each bin)
+gen coh_rlb = .		
+foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from the first, then incrementing by 1 each time.
+	replace coh_rlb = `num' if d_c`num' == 1
+}
+
+** Create Deaton's time vriables.
+* gen time dummy (This is only used for relabelling later on and create Deaton's time dummy)
+tab year, g(d_t) // dummies for each year
+local n_year = r(r)	
+
+// relabel year to be from 1 to n_year instead of the actual year.
+gen year_rlb = .
+foreach num of numlist 1(1)`n_year'{
+	replace year_rlb = `num' if d_t`num' == 1
+}
+
+* gen Deaton's time variables.
+foreach num of numlist 3(1) `n_year' {
+	// dt* = dt-(t-1)*d2+(t-2)*d1		[see Deaton(1997, p126) equation (2.95)]
+	gen d_t`num'star=d_t`num'-(`num'-1)*d_t2+(`num'-2)*d_t1
+}
 
 ********************************************************************************
 * 1. PARAMETERS 
@@ -54,6 +101,12 @@ local n_wexp_per_year = `n_group' / `n_year'
 * 3. Running the algorithm
 ********************************************************************************
 
+
+** Let's try to do on my own first.
+* Intitial guess g^0
+
+reg logrealwage i.wexp_group 
+
 gen cons_term = .
 
 ** The algorithm initialize only if there are enough observations
@@ -76,11 +129,6 @@ if bin_obs_temp_min[1]>$min_obs & `num_wexp' == $max_wexp/$bin_wexp  {
 		drop temp*
 	}
 
-	
-	foreach num of numlist 3(1) `n_year' {
-		// dt* = dt-(t-1)*d2+(t-2)*d1		[see Deaton(1997, p126) equation (2.95)]
-		gen d`num'star=d`num'-(`num'-1)*d2+(`num'-2)*d1
-	}
 	
 	tab year, gen(year_mm)
 	local n_year_mm = r(r)				// number of years
