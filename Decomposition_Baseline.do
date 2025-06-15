@@ -145,24 +145,25 @@ gen profile_year_plot = .
 local n_cohort2 = `n_cohort' - 1		// number of effective coefficients for cohort
 local n_year2 = `n_year' - 2			// number of effective coefficients for year
 local n_wexp2 = `n_wexp' - 1			// number of effective coefficients for experience
-replace profile_wexp = 0 if _n == 1 // (since it is the base group)
+replace profile_wexp = 0 if _n == 1 // (since it is the base group) (_n is the row number)
 replace profile_wexp_plot = 1 if _n == 1
 replace profile_year_plot = 1 if _n == 1
 replace profile_year_plot = 2 if _n == 2
 
 * Experience Profile
-foreach num of numlist 1(1)`n_wexp2' {
-	replace profile_wexp = coef_mat[1,`num'] if _n==`num'+1 //accesing the first row, and `num' column of the matrix. This works since we put the coefficients of exp bins to come first.
-	replace profile_wexp_plot = `num' + 1 if _n==`num'+1
+foreach num of numlist 2(1)`n_wexp' { // have to start from 2 since the first is the coeff of base group, which is = 0.
+	replace profile_wexp = coef_mat[1,`num'] if _n==`num' //accesing the first row, and `num' column of the matrix. This works since we put the coefficients of exp bins to come first.
+	replace profile_wexp_plot = `num' if _n==`num'
 }
 
 * Cohort Profile
-replace profile_coh = 0 if _n == 1
+replace profile_coh = 0 if _n == 1 // since it is the base group.
 replace profile_coh_plot = 1 if _n == 1
-foreach num of numlist 1(1)`n_cohort2' {
-	replace profile_coh = coef4[1, $ctrledu + `n_wexp2' + `num'] if _n==`num' + 1
-	replace profile_coh_plot = `num' + 1 if _n==`num' + 1
+foreach num of numlist 2(1)`n_cohort' { // have to start from 2 since the first is the coeff of base group, which is = 0.
+	replace profile_coh = coef4[1, `n_wexp' + `num'] if _n==`num' // since the coeff of cohort come after the coeff of experience groups.
+	replace profile_coh_plot = `num'  if _n==`num'
 }
+
 * Year Profile (Note: this step takes into account that repeated cross-section might be NOT at an yearly frequency)
 foreach num of numlist 1(1)`n_year2' {
 	replace profile_year = coef4[1,$ctrledu + `n_wexp2' + `n_cohort2' + `num'] if _n==`num' +2
