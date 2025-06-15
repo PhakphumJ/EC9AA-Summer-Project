@@ -14,6 +14,10 @@ egen wexp_group = cut(exp_baseline), at(0(5)40) // working life = 40 yrs old. In
 
 drop if wexp_group == . // use only those in interested experience groups (no negative experience or over 40 years)
 
+// get number of experience groups.
+tab wexp_group
+local n_wexp = r(r)		// number of experience groups
+
 * gen cohort bins (from [the minimum ybirth rounded to a multiple of 5] to [the maximum of ybirth rounded to be multiple of 5]) (e.g. from 1870 t0 2024)
 sum ybirth
 local min_ybirth = r(min)
@@ -127,6 +131,58 @@ gen Def_logrealwage = logrealwage - growth_y*(year_rlb - 1)
 
 * Decomposing (the main regression)
 reg Def_logrealwage i.wexp_group i.coh_rlb d_*star [pweight=perwt] // (they used aweight, I think pweight is more appropriate)
+mat coef_mat=e(b) // store the estimated coeff in a matrix.
+
+* Fill in the profiles using the estimated coefficients. *** These will become a new dataset at the end.
+gen profile_wexp = .
+gen profile_coh = .
+gen profile_year = .
+gen profile_wexp_plot = . // These will be x-axis
+gen profile_coh_plot = .
+gen profile_year_plot = .
+
+* 3.7 Fill In Profiles using estimated coefficients in regression. (Earning profiles are decomposed into cohort, experience, and time profile. The first difference of the profiles are the effects.)
+local n_cohort2 = `n_cohort' - 1		// number of effective coefficients for cohort
+local n_year2 = `n_year' - 2			// number of effective coefficients for year
+local n_wexp2 = `n_wexp' - 1			// number of effective coefficients for experience
+replace profile_wexp = 0 if _n == 1 // (since it is the base group)
+replace profile_wexp_plot = 1 if _n == 1
+replace profile_year_plot = 1 if _n == 1
+replace profile_year_plot = 2 if _n == 2
+
+* Experience Profile
+foreach num of numlist 1(1)`n_wexp2' {
+	replace profile_wexp = coef_mat[1,`num'] if _n==`num'+1 //accesing the first row, and `num' column of the matrix. This works since we put the coefficients of exp bins to come first.
+	replace profile_wexp_plot = `num' + 1 if _n==`num'+1
+}
+
+* Cohort Profile
+replace profile_coh = 0 if _n == 1
+replace profile_coh_plot = 1 if _n == 1
+foreach num of numlist 1(1)`n_cohort2' {
+	replace profile_coh = coef4[1, $ctrledu + `n_wexp2' + `num'] if _n==`num' + 1
+	replace profile_coh_plot = `num' + 1 if _n==`num' + 1
+}
+* Year Profile (Note: this step takes into account that repeated cross-section might be NOT at an yearly frequency)
+foreach num of numlist 1(1)`n_year2' {
+	replace profile_year = coef4[1,$ctrledu + `n_wexp2' + `n_cohort2' + `num'] if _n==`num' +2
+	replace profile_year_plot = `num' + 2 if _n==`num' +2
+}
+gen temp_1 = . 
+foreach num of numlist 3(1)`n_year'{
+	replace temp_1 = s_y[`num'-1] - s_y[`num'-2] if _n == `num'
+}
+gen temp_2 = temp_1 * profile_year
+egen psi = sum(temp_2)
+gen temp_4 = sum(temp_1)
+replace temp_4 = temp_4 + s_y[2] 
+gen temp_5 = temp_4 * profile_year
+egen fi = sum(temp_5)
+replace profile_year = (1/s_y[1])*(((s_y[2]/s_y[1])-1)*fi - (s_y[2]/s_y[1])*psi) if _n == 1
+replace profile_year = (psi - fi)/(s_y[1]) if _n == 2
+
+* Next, check wheter we manage to make flat spot assumption holds.
+ 
 
 ** Loop
 while `diff' > $precision & `iter' < $max_iter{
@@ -235,43 +291,7 @@ if bin_obs_temp_min[1]>$min_obs & `num_wexp' == $max_wexp/$bin_wexp  {
 			mat coef4=e(b)									// regression coefficients
 			local help=colsof(coef4)
 
-			* 3.7 Fill In Profiles using estimated coefficients in regression
-			local n_cohort2 = `n_cohort' - 1		// number of effective coefficients for cohort
-			local n_year2 = `n_year' - 2			// number of effective coefficients for year
-			local n_wexp2 = `n_wexp' - 1			// number of effective coefficients for experience
-			replace profile_wexp = 0 if _n == 1
-			replace profile_wexp_plot = 1 if _n == 1
-			replace profile_year_plot = 1 if _n == 1
-			replace profile_year_plot = 2 if _n == 2
-			* Experience Profile
-			foreach num of numlist 1(1)`n_wexp2' {
-				replace profile_wexp = coef4[1,$ctrledu + `num'] if _n==`num'+1
-				replace profile_wexp_plot = `num' + 1 if _n==`num'+1
-			}
-			* Cohort Profile
-			replace profile_coh = 0 if _n == 1
-			replace profile_coh_plot = 1 if _n == 1
-			foreach num of numlist 1(1)`n_cohort2' {
-				replace profile_coh = coef4[1, $ctrledu + `n_wexp2' + `num'] if _n==`num' + 1
-				replace profile_coh_plot = `num' + 1 if _n==`num' + 1
-			}
-			* Year Profile (Note: this step takes into account that repeated cross-section might be NOT at an yearly frequency)
-			foreach num of numlist 1(1)`n_year2' {
-				replace profile_year = coef4[1,$ctrledu + `n_wexp2' + `n_cohort2' + `num'] if _n==`num' +2
-				replace profile_year_plot = `num' + 2 if _n==`num' +2
-			}
-			gen temp_1 = . 
-			foreach num of numlist 3(1)`n_year'{
-				replace temp_1 = s_y[`num'-1] - s_y[`num'-2] if _n == `num'
-			}
-			gen temp_2 = temp_1 * profile_year
-			egen psi = sum(temp_2)
-			gen temp_4 = sum(temp_1)
-			replace temp_4 = temp_4 + s_y[2] 
-			gen temp_5 = temp_4 * profile_year
-			egen fi = sum(temp_5)
-			replace profile_year = (1/s_y[1])*(((s_y[2]/s_y[1])-1)*fi - (s_y[2]/s_y[1])*psi) if _n == 1
-			replace profile_year = (psi - fi)/(s_y[1]) if _n == 2
+			
 
 			* 3.5 Calculate the Growth Rates And Update Year Growth According to Choosed Restrictions
 			* Year and Cohort Effects
