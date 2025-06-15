@@ -103,9 +103,11 @@ local n_wexp_per_year = `n_group' / `n_year'
 
 
 ** Let's try to do on my own first.
-* Intitial guess g^0
+* Intitial guess g_0
 
-reg logrealwage i.wexp_group 
+reg logrealwage i.wexp_group year_rlb
+local g_0 = _b[year_rlb]
+display "Intial growth of the linear time trend (g_0): `g_0'"
 
 gen cons_term = .
 
