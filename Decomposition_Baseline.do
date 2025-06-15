@@ -4,7 +4,7 @@ clear
 cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data"
 use "CPS_Cleaned.dta"
 
-** Let's try to do figure 4 exactly first. Hence, use data from 1986 - 2012. And restrict sample to those born from 1935 - 1984
+*** Let's try to do figure 4 exactly first. Hence, use data from 1986 - 2012. And restrict sample to those born from 1935 - 1984
 
 keep if year >= 1986 & year <= 2012
 keep if ybirth >= 1935 & ybirth <= 1984
@@ -58,6 +58,12 @@ foreach num of numlist 3(1) `n_year' {
 	gen d_t`num'star=d_t`num'-(`num'-1)*d_t2+(`num'-2)*d_t1
 }
 
+* Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
+rename asecwt perwt
+bys year: egen tot_pers =sum(perwt)
+replace perwt = perwt/tot_pers			
+bys year: egen av_perwt = mean(perwt)
+
 ********************************************************************************
 * 1. PARAMETERS 
 ********************************************************************************
@@ -103,13 +109,28 @@ local n_wexp_per_year = `n_group' / `n_year'
 
 
 ** Let's try to do on my own first.
-* Intitial guess g_0
 
+** Initilize
+gen cons_term = .
+local iter = 1
+local diff = 1 // (we want to minimize this.)
+
+* Intitial guess g_0
 reg logrealwage i.wexp_group year_rlb
 local g_0 = _b[year_rlb]
 display "Intial growth of the linear time trend (g_0): `g_0'"
 
-gen cons_term = .
+gen growth_y = `g_0'
+
+* Deflating the wage
+gen Def_logrealwage = logrealwage - growth_y*(year_rlb - 1)
+
+* Decomposing (the main regression)
+reg Def_logrealwage i.wexp_group i.coh_rlb d_*star [pweight=perwt] // (they used aweight, I think pweight is more appropriate)
+
+** Loop
+while `diff' > $precision & `iter' < $max_iter{
+
 
 ** The algorithm initialize only if there are enough observations
 if bin_obs_temp_min[1]>$min_obs & `num_wexp' == $max_wexp/$bin_wexp  { 
