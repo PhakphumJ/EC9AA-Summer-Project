@@ -107,6 +107,7 @@ tab group_temp
 local n_group = r(r)
 local n_wexp_per_year = `n_group' / `n_year'
 
+
 ********************************************************************************
 * 3. Running the algorithm
 ********************************************************************************
@@ -119,18 +120,25 @@ gen cons_term = .
 local iter = 1
 local diff = 1 // (we want to minimize this.)
 
+// preallocate some variables, which are used for convergence
+gen growth_wexp = . //(growth of exp effect in the last working years)
+gen wexp_high = . //(exp effect in the last bin)
+gen wexp_low = . //(exp effect in the first bin of the flat part)
+
+
 * Intitial guess g_0
 reg logrealwage i.wexp_group year_rlb
 local g_0 = _b[year_rlb]
 display "Intial growth of the linear time trend (g_0): `g_0'"
 
-gen growth_y = `g_0'
+gen growth_m = `g_0'
+gen growth_m_plusone = .
 
 * Deflating the wage
-gen Def_logrealwage = logrealwage - growth_y*(year_rlb - 1)
+gen Def_logrealwage = logrealwage - growth_m*(year_rlb - 1)
 
 * Decomposing (the main regression)
-reg Def_logrealwage i.wexp_group i.coh_rlb d_*star [pweight=perwt] // (they used aweight, I think pweight is more appropriate)
+reg Def_logrealwage i.wexp_group i.coh_rlb d_*star [pweight=perwt] // (they used aweight, I think pweight is more appropriate) (xi to generate dummy variables corresponding to each level of categorical vars.)
 mat coef_mat=e(b) // store the estimated coeff in a matrix.
 
 * Fill in the profiles using the estimated coefficients. *** These will become a new dataset at the end.
@@ -159,31 +167,49 @@ foreach num of numlist 2(1)`n_wexp' { // have to start from 2 since the first is
 replace profile_coh = 0 if _n == 1 // since it is the base group.
 replace profile_coh_plot = 1 if _n == 1
 foreach num of numlist 2(1)`n_cohort' { // have to start from 2 since the first is the coeff of base group, which is = 0.
-	replace profile_coh = coef4[1, `n_wexp' + `num'] if _n==`num' // since the coeff of cohort come after the coeff of experience groups.
+	replace profile_coh = coef_mat[1, `n_wexp' + `num'] if _n==`num' // since the coeff of cohort come after the coeff of experience groups.
 	replace profile_coh_plot = `num'  if _n==`num'
 }
 
 * Year Profile (Note: this step takes into account that repeated cross-section might be NOT at an yearly frequency)
 foreach num of numlist 1(1)`n_year2' {
-	replace profile_year = coef4[1,`n_wexp' + `n_cohort' + `num'] if _n==`num' +2
+	replace profile_year = coef_mat[1,`n_wexp' + `n_cohort' + `num'] if _n==`num' +2
 	replace profile_year_plot = `num' + 2 if _n==`num' +2
 }
+
+* Solve for the first two time effects, i.e. gamma_1, gamma_2. ((1) sum of time effects = 0, (2) sum of s' Gamma = 0)
+gen s_y = profile_year_plot //(s_y = (1,2,..., n_year))
+
 
 gen temp_1 = . 
 foreach num of numlist 3(1)`n_year'{
 	replace temp_1 = s_y[`num'-1] - s_y[`num'-2] if _n == `num'
 }
+
 gen temp_2 = temp_1 * profile_year
 egen psi = sum(temp_2)
 gen temp_4 = sum(temp_1)
 replace temp_4 = temp_4 + s_y[2] 
 gen temp_5 = temp_4 * profile_year
 egen fi = sum(temp_5)
+// These are analytical soln for the 1st and 2nd time effects. 
 replace profile_year = (1/s_y[1])*(((s_y[2]/s_y[1])-1)*fi - (s_y[2]/s_y[1])*psi) if _n == 1
 replace profile_year = (psi - fi)/(s_y[1]) if _n == 2
 
 * Next, check wheter we manage to make flat spot assumption holds.
- 
+* Extract the experience effect in the Last Ten Years (for baseline assumption, exp effect in the 6th, 7th, and 8th bins should be the same)
+replace wexp_high = profile_wexp[$flat_end]
+replace wexp_low = profile_wexp[$flat_start]
+local flat_length = ($flat_end - $flat_start)*5 //number of years in the flat part.
+replace growth_wexp = (wexp_high - wexp_low)/`flat_length' + $delta
+
+* Update the growth of time effect g^{m+1} = g^m + \delta * r^m_{end}
+replace growth_m_plusone = growth_m + $dump*growth_wexp
+local diff = abs(growth_m_plusone - growth_m)/abs(growth_m)
+
+display "The difference is: `diff'"
+
+
 
 ** Loop
 while `diff' > $precision & `iter' < $max_iter{
