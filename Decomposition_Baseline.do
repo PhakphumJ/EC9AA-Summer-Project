@@ -219,9 +219,22 @@ while `diff' > $precision & `iter' < $max_iter{
 
 	display "The difference is: `diff'"
 	
-	drop *temp* s_y psi fi
+	if `diff' > $precision{ 
+		drop *temp* s_y psi fi
+	}
 	
 	local iter = `iter' + 1
 }
 
 gen iter = `iter' - 1
+
+********************************************************************************
+* 4. Prepare data for plotting (keeping only relevant variables and converting thing from log to levels)
+********************************************************************************
+gen profile_year_cyc = profile_year // this is the cyclical part
+replace profile_year = profile_year*(s_y[1]) if _n==1 // the trend of time effects
+replace profile_year = profile_year*(s_y[_n] - s_y[_n - 1]) + growth_m*(s_y - s_y[1]) if _n >1 // time effect = trend + cylical
+replace profile_wexp = exp(profile_wexp) // converting to levels
+replace profile_year = exp(profile_year) // converting to levels
+replace profile_coh = exp(profile_coh) // converting to levels
+
