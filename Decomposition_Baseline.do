@@ -1,8 +1,8 @@
 *** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4) ***
 
 clear
-cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data"
-use "CPS_Cleaned.dta"
+cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\CPS_Cleaned.dta"
 
 *** Let's try to do figure 4 exactly first. Hence, use data from 1986 - 2012. And restrict sample to those born from 1935 - 1984
 
@@ -261,3 +261,5 @@ replace plot_wexp = . if plot_wexp >= $max_wexp // keeping only 0-35
 keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not containing the data for plotting. 
 keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
 drop profile*plot
+
+save "Data\Temp\HLT_results_CPS_1986_2012.dta", replace
