@@ -157,6 +157,8 @@ while `diff' > $precision & `iter' < $max_iter{
 	
 	* Decomposing (the main regression)
 	reg Def_logrealwage_temp i.wexp_group i.coh_rlb d_*star [pweight=perwt] // (they used aweight, I think pweight is more appropriate) 
+	
+	replace cons_term = _b[_cons]
 	mat coef_mat=e(b) // store the estimated coeff in a matrix.
 	
 	* 3.7 Fill In Profiles using estimated coefficients in regression. 
@@ -238,3 +240,24 @@ replace profile_wexp = exp(profile_wexp) // converting to levels
 replace profile_year = exp(profile_year) // converting to levels
 replace profile_coh = exp(profile_coh) // converting to levels
 
+
+egen min_year = min(year)
+gen plot_year = s_y + min_year - s_y[1] // (so that we have the years in the x-axis)
+
+egen coho_min = min(byear)
+egen coho_max = max(byear)
+gen plot_coh  = coho_min
+gen coho_gap = coho_max - coho_min
+local n_coho = coho_gap[1]/$bin_coh + 1
+display `n_coho'
+foreach num of numlist 2(1)`n_coho'{
+	replace plot_coh  = plot_coh + (`num' - 1)*$bin_coh if _n == `num'
+} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+
+gen plot_wexp = (_n-1)*$bin_wexp // i.e. 0,5,10,15,...
+replace plot_wexp = . if plot_wexp >= $max_wexp // keeping only 0-35
+
+
+keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not containing the data for plotting. 
+keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
+drop profile*plot
