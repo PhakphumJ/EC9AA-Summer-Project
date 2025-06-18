@@ -166,4 +166,34 @@ graph export "Figs\exp_fig4_two_CPSs.jpg", name(exp2) replace
 graph export "Figs\coh_fig4_two_CPSs.jpg", name(coh2) replace
 graph export "Figs\year_fig4_two_CPSs.jpg", name(year2) replace
 
+**** Next, let's plot just the results from all periods. 
+** Experience **
+twoway (scatter profile_wexp_all_period plot_wexp_all_period, msymbol(dh) mcolor(blue) msize(large) connect(l) lcolor(blue)), /// 
+xlabel(0(5)40,labsize(medium)) ylabel(1(1)4,labsize(medium)) 		/// 
+xtitle("Potential Experience",size(medium)) ytitle("")	///
+leg(off)	///
+title("Experience Effects using 1961-2023 data",size(large) color(black)) name(exp3, replace) xsize(14) ysize(10)
 
+
+** Cohort **
+twoway (scatter profile_coh_all_period plot_coh_all_period , msymbol(dh) mcolor(blue) msize(large) connect(l) lcolor(blue)), /// 
+xlabel(1910(10)1995,labsize(medium))  xmtick(##2) ylabel(1(0.25)2,labsize(medium)) 		/// 
+xtitle("Birth Year",size(medium)) ytitle("")	///
+leg(off)	///
+title("Cohort Effects using 1961-2023 data",size(large) color(black)) name(coh3, replace) xsize(14) ysize(10)
+
+** Time **
+* Normalize the first time effect to 1.
+gen F_per_time_all_period = profile_year_all_period[1]
+
+replace profile_year_all_period = profile_year_all_period/F_per_time_all_period
+
+twoway (scatter profile_year_all_period plot_year, msymbol(dh) mcolor(blue) msize(large) connect(l) lcolor(blue)), /// 
+xlabel(1960(10)2025,labsize(medium)) ylabel(1(1)4,labsize(medium)) 		/// 
+xtitle("Year",size(medium)) ytitle("")	///
+leg(off)	///
+title("Time Effects using 1961-2023 data",size(large) color(black)) name(year3, replace) xsize(14) ysize(10)
+
+** Combine and export 
+graph combine exp3 coh3 year3,	xsize(20) ysize(8) row(1) 
+graph export "Figs\CPS_all_periods_results.jpg", replace	
