@@ -100,3 +100,35 @@ twoway (scatter profile_year_all_orig plot_year, msymbol(dh) mcolor(blue) msize(
 graph export "Figs\exp_fig4_three_outputs.jpg", name(exp) replace
 graph export "Figs\coh_fig4_three_outputs.jpg", name(coh) replace
 graph export "Figs\year_fig4_three_outputs.jpg", name(year) replace
+
+*** Second, compare the results using all time periods with results using only data from 1986-2012.
+clear
+use "Data\Temp\HLT_results_CPS_1961_2023.dta"
+keep profile_wexp plot_wexp profile_coh plot_coh profile_year plot_year
+foreach var of varlist * {
+    rename `var' `var'_all_period
+}
+rename plot_year_all_period plot_year
+save "Data\Temp\HLT_results_CPS_1961_2023_profile.dta", replace
+
+
+** Merging
+clear
+use "Data\Temp\HLT_results_CPS_1986_2012_all_self_profile.dta"
+merge 1:1 plot_year using "Data\Temp\HLT_results_CPS_1961_2023_profile.dta", nogenerate 
+sort plot_year
+* To compare have to normalize. Cohort Effects of 1935 to be 1. Time Effects of 1986 to be 1. Experience effects need no further normalization. After that we would need to subset the date for plotting.
+
+
+* Normalizing the cohort effect. 1935 to 1
+gen coh_effect_1935_all = profile_coh_all_period[6] // it's in the 6th row.
+gen profile_coh_all_period_norm = profile_coh_all_period/coh_effect_1935_all
+
+* Normalizing the time effect. 1986 to 1
+gen time_effect_1935_sub = profile_year_all_self[26] // it's in the 26th row.
+gen profile_year_self_sub_norm = profile_year_all_self/time_effect_1935_sub
+gen time_effect_1935_all = profile_year_all_period[26] // it's in the 26th row.
+gen profile_year_all_period_norm = profile_year_all_period/time_effect_1935_all
+
+
+*** Plotting the comparisons *** 
