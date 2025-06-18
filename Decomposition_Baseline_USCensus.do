@@ -1,6 +1,5 @@
 *** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4) ***
-** But, now use the whole available periods of CPS data (1961 - 2023).
-
+** Using Census Data **
 clear
 cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
 use "Data\US_Census_Cleaned.dta"
@@ -50,6 +49,12 @@ foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from
 * gen time dummy (This is only used for relabelling later on and create Deaton's time dummy)
 tab year, g(d_t) // dummies for each year
 local n_year = r(r)	
+sum year
+local min_y = r(min)
+local max_y = r(max)
+local n_year_true = `max_y' - `min_y' + 1
+display "#disticnt years: `n_year' periods"
+display "#Length of the time period: `n_year_true' years"
 
 // relabel year to be from 1 to n_year instead of the actual year.
 // Do year - 1938 instead since the inteval between is not constant.
@@ -103,7 +108,7 @@ tab year
 local n_year = r(r)
 tab group_temp
 local n_group = r(r)
-local n_wexp_per_year = `n_group' / `n_year'
+local n_wexp_per_year = `n_group' / `n_year_true'
 
 
 ********************************************************************************
@@ -165,7 +170,7 @@ while `diff' > $precision & `iter' < $max_iter{
 	mat coef_mat=e(b) // store the estimated coeff in a matrix.
 	
 	* 3.7 Fill In Profiles using estimated coefficients in regression. 
-	local n_year2 = `n_year' - 2 // number of effective coefficients for year
+	local n_year2 = `n_year' - 2 // number of effective coefficients for period.
 
 	replace profile_wexp = 0 if _n == 1 // (since it is the base group) (_n is the row number)
 	replace profile_wexp_plot = 1 if _n == 1
@@ -236,16 +241,28 @@ gen iter = `iter' - 1
 ********************************************************************************
 * 4. Prepare data for plotting (keeping only relevant variables and converting thing from log to levels)
 ********************************************************************************
+// cannot multiply (1,2,3..) to growth since the intervals b/w years are not equal.
+// The years are 1939, 1949, 1959, 1969, 1979, 1989, 1999, 2000 - 2022 
+// Hence, we want s_y to be 1,11,21,31,41,51,61,62-84 instead of (1,2,...30)
+gen s_y_relabel = s_y 
+foreach num of numlist 2(1)7{
+	replace s_y_relabel = s_y_relabel[1] + 10 if _n == `num'
+}
+foreach num of numlist 8(1)`n_year'{
+	replace s_y_relabel = s_y_relabel + 54 if _n == `num'
+}
+
+
 gen profile_year_cyc = profile_year // this is the cyclical part
 replace profile_year = profile_year*(s_y[1]) if _n==1 // the trend of time effects
-replace profile_year = profile_year*(s_y[_n] - s_y[_n - 1]) + growth_m*(s_y - s_y[1]) if _n >1 // time effect = trend + cylical
+replace profile_year = profile_year*(s_y[_n] - s_y[_n - 1]) + growth_m*(s_y_relabel - s_y_relabel[1]) if _n >1 // time effect = trend + cylical
 replace profile_wexp = exp(profile_wexp) // converting to levels
 replace profile_year = exp(profile_year) // converting to levels
 replace profile_coh = exp(profile_coh) // converting to levels
 
 
 egen min_year = min(year)
-gen plot_year = s_y + min_year - s_y[1] // (so that we have the years in the x-axis)
+gen plot_year = s_y_relabel + min_year - s_y_relabel[1] // (so that we have the years in the x-axis)
 
 egen coho_min = min(byear)
 egen coho_max = max(byear)
