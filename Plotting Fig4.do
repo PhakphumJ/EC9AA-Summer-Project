@@ -134,10 +134,36 @@ gen profile_year_all_period_norm = profile_year_all_period/time_effect_1935_all
 replace plot_wexp = plot_wexp + 2.5 // This is the shift the point to the middle of the bins.
 replace plot_wexp_all_period = plot_wexp_all_period + 2.5 // This is the shift the point to the middle of the bins.
 
-
 twoway (scatter profile_wexp_all_self plot_wexp, msymbol(th) mcolor(emerald) msize(large) connect(l) lcolor(emerald))		/// 
 (scatter profile_wexp_all_period plot_wexp_all_period, msymbol(dh) mcolor(blue) msize(large) connect(l) lcolor(blue)), /// 
 xlabel(0(5)40,labsize(medium)) ylabel(1(1)4,labsize(medium)) 		/// 
 xtitle("Potential Experience",size(medium)) ytitle("")	///
 legend(order(1 "1986-2012" 2 "1961-2023") rows(1) pos(6) size(medium))	///
 title("Experience Effects",size(large) color(black)) name(exp2, replace) xsize(14) ysize(10)
+
+
+** Cohort **
+replace plot_coh = plot_coh + 2.5 // This is the shift the point to the middle of the bins.
+replace plot_coh_all_period = plot_coh_all_period + 2.5 // This is the shift the point to the middle of the bins.
+
+twoway (scatter profile_coh_all_self plot_coh, msymbol(th) mcolor(emerald) msize(large) connect(l) lcolor(emerald))		/// 
+(scatter profile_coh_all_period_norm plot_coh_all_period if plot_coh_all_period > 1935 & plot_coh_all_period < 1985, msymbol(dh) mcolor(blue) msize(large) connect(l) lcolor(blue)), /// 
+xlabel(1935(10)1985,labsize(medium))  xmtick(##2) ylabel(1(0.25)2,labsize(medium)) 		/// 
+xtitle("Birth Year",size(medium)) ytitle("")	///
+legend(order(1 "1986-2012" 2 "1961-2023") rows(1) pos(6) size(medium))	///
+title("Cohort Effects",size(large) color(black)) name(coh2, replace) xsize(14) ysize(10)
+
+** Time **
+twoway (scatter profile_year_self_sub_norm plot_year if plot_year > 1986 & plot_year < 2012, msymbol(th) mcolor(emerald) msize(large) connect(l) lcolor(emerald))		/// 
+(scatter profile_year_all_period_norm plot_year if plot_year > 1986 & plot_year < 2012, msymbol(dh) mcolor(blue) msize(large) connect(l) lcolor(blue)), /// 
+xlabel(1985(5)2010,labsize(medium)) ylabel(1(1)4,labsize(medium)) 		/// 
+xtitle("Year",size(medium)) ytitle("")	///
+legend(order(1 "1986-2012" 2 "1961-2023") rows(1) pos(6) size(medium))	///
+title("Time Effects",size(large) color(black)) name(year2, replace) xsize(14) ysize(10)
+
+** Exporting the graph
+graph export "Figs\exp_fig4_two_CPSs.jpg", name(exp2) replace
+graph export "Figs\coh_fig4_two_CPSs.jpg", name(coh2) replace
+graph export "Figs\year_fig4_two_CPSs.jpg", name(year2) replace
+
+
