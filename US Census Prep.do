@@ -6,30 +6,25 @@
 *** Preparing the data
 clear
 cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data"
-use cps_00004.dta
+use usa_census_smallest.dta
 
-* drop irrelevant variables (for all analysis)
-drop serial month cpsid asecflag hflag statecensus pernum cpsidp cpsidv asecwth
+* drop those with missing wages or invalid wages
+drop if incwage == 999999 | incwage == 999998 | incwage == .
 
-* drop irrelevant variables (for this exercise)
-drop race marst occ ind inctot incbus incfarm inclongj oincbus oincfarm oincwage
+* drop those with wage = 0
+drop if incwage == 0
+
+* Replace perwt with expwtp in year where expwtp is available. 
+replace perwt = expwtp if expwtp != .
+drop expwtp statefip
 
 * subtract 1 from year and age (since income variable is the income earned last year)
 replace age = age - 1
 replace year = year - 1
 
-* count obs b/w 1986 - 2012
-count if year >= 1986 & year <= 2012
-// get #obs = 4,768,394. The data in replication packgage has #obs = 4,768,394. So, we get the exact same number.
-// If I did not subtract 1 from year and age, I would have gotten 4,723,421. 
-
 * drop those with weight < 0 (Note: These are valid weights)
-drop if asecwt < 0 // there are only a few obs with negative weight.
-* drop those with missing wages or invalid wages
-drop if incwage == 99999999 | incwage == 99999998 | incwage == .
+drop if perwt < 0 // there are no obs with negative weight in the census.
 
-* drop those with wage = 0
-drop if incwage == 0
 
 * create real wage variable and its log
 merge m:1 year using "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data\CPI_1913_to_2024_cleaned.dta"
@@ -40,22 +35,21 @@ gen realwage = incwage/CPI
 gen logrealwage = log(realwage)
 
 * Create imputed years of schooling
-drop if educ == . | educ == 999  // drop missing or unknown level of educations
+drop if educd == . | educd == 999  // drop missing or unknown level of educations
 
 
 gen eduyrs = . // Create the new variable. Using the same logic in the replication packgage.
 
-replace eduyrs = 0 if educ < 10
-replace eduyrs = 6 if educ >= 10 & educ <= 32
-replace eduyrs = 9 if educ >= 40 & educ <= 60
-replace eduyrs = 12 if educ >= 70 & educ <= 81
-replace eduyrs = 14 if educ >= 90 & educ <= 100
-replace eduyrs = 16 if educ >= 110 & educ <= 122
-replace eduyrs = 18 if educ >= 123 & educ <= 124
-replace eduyrs = 20 if educ == 125
+replace eduyrs = 0 if educd <= 12
+replace eduyrs = 6 if educd >= 13 & educd <= 26
+replace eduyrs = 9 if educd >= 30 & educd <= 50
+replace eduyrs = 12 if educd >= 60 & educd <= 71
+replace eduyrs = 14 if educd >= 80 & educd <= 90
+replace eduyrs = 16 if educd >= 100 & educd <= 113
+replace eduyrs = 18 if educd >= 114 & educd <= 115
+replace eduyrs = 20 if educd == 116
 
-* create year-of-birth variable
-gen ybirth = year - age
+drop educd educ
 
 * create experience variable
 gen exp_baseline = min(age - eduyrs - 6, age - 18)
@@ -70,7 +64,7 @@ foreach y of local years_list {
     display "Processing year: `y'" 
     
     // Calculate 2.5th and 97.5th percentiles for the current year
-    _pctile incwage [pweight=asecwt] if year == `y', percentiles(2.5 97.5)
+    _pctile incwage [pweight=perwt] if year == `y', percentiles(2.5 97.5)
     
     local p2_5 = r(r1)
     local p97_5 = r(r2)
@@ -96,7 +90,5 @@ keep if sex == 1
 * drop outlier
 drop if outlier == 1
 
-count if year >= 1986 & year <= 2012 // I expect to have 1,127,840 obs. But only got 1,121,224 obs. The difference might come from how the outlier flag is constructed.
-
 ** Export the data
-save "CPS_Cleaned.dta", replace 
+save "US_Census_Cleaned.dta", replace 
