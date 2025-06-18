@@ -49,9 +49,6 @@ merge 1:1 plot_year using "Data\Temp\HLT_results_CPS_1986_2012_all_self_profile.
 
 *** Plotting ***
 ** Experience **
-dis %9.2f profile_wexp_all_orig[_N]
-dis %9.2f profile_wexp_self_data_orig_algo[_N]
-dis %9.2f profile_wexp_all_self[_N]
 
 replace plot_wexp = plot_wexp + 2.5 // This is the shift the point to the middle of the bins.
 
@@ -132,3 +129,15 @@ gen profile_year_all_period_norm = profile_year_all_period/time_effect_1935_all
 
 
 *** Plotting the comparisons *** 
+** Experience **
+
+replace plot_wexp = plot_wexp + 2.5 // This is the shift the point to the middle of the bins.
+replace plot_wexp_all_period = plot_wexp_all_period + 2.5 // This is the shift the point to the middle of the bins.
+
+
+twoway (scatter profile_wexp_all_self plot_wexp, msymbol(th) mcolor(emerald) msize(large) connect(l) lcolor(emerald))		/// 
+(scatter profile_wexp_all_period plot_wexp_all_period, msymbol(dh) mcolor(blue) msize(large) connect(l) lcolor(blue)), /// 
+xlabel(0(5)40,labsize(medium)) ylabel(1(1)4,labsize(medium)) 		/// 
+xtitle("Potential Experience",size(medium)) ytitle("")	///
+legend(order(1 "1986-2012" 2 "1961-2023") rows(1) pos(6) size(medium))	///
+title("Experience Effects",size(large) color(black)) name(exp2, replace) xsize(14) ysize(10)
