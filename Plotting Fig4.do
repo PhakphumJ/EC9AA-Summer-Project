@@ -58,8 +58,45 @@ replace plot_wexp = plot_wexp + 2.5 // This is the shift the point to the middle
 twoway (scatter profile_wexp_all_orig plot_wexp, msymbol(dh) mcolor(blue) msize(large) connect(l) lcolor(blue)) ///
 	(scatter profile_wexp_self_data_orig_algo plot_wexp, msymbol(oh) mcolor(red) msize(large) connect(l) lcolor(red)) /// 
 	(scatter profile_wexp_all_self plot_wexp, msymbol(th) mcolor(emerald) msize(large) connect(l) lcolor(emerald)),		///
-	xlabel(0(5)40,labsize(large)) ylabel(1(1)4,labsize(large)) 		/// 
+	xlabel(0(5)40,labsize(medium)) ylabel(1(1)4,labsize(medium)) 		/// 
 	xtitle("Potential Experience",size(medium)) ytitle("")	///
 	legend(order(1 "Results from the paper" 2 "Self-cleaned data with algo from the replication packgage" 3 "Self-cleaned data with self-built algo") rows(3) pos(6) size(medium))	///
-	title("Experience Effects",size(large) color(black)) name(exp, replace)
+	title("Experience Effects",size(large) color(black)) name(exp, replace) xsize(14) ysize(10)
 
+	
+** Cohort **
+
+replace plot_coh = plot_coh + 2.5 // This is the shift the point to the middle of the bins.
+
+twoway (scatter profile_coh_all_orig plot_coh, msymbol(dh) mcolor(blue) msize(large) connect(l) lcolor(blue)) ///
+	(scatter profile_coh_self_data_orig_algo plot_coh, msymbol(oh) mcolor(red) msize(large) connect(l) lcolor(red)) /// 
+	(scatter profile_coh_all_self plot_coh, msymbol(th) mcolor(emerald) msize(large) connect(l) lcolor(emerald)),		///
+	xlabel(1935(10)1985,labsize(medium))  xmtick(##2) ylabel(1(0.25)2,labsize(medium)) 		/// 
+	xtitle("Birth Year",size(medium)) ytitle("")	///
+	legend(order(1 "Results from the paper" 2 "Self-cleaned data with algo from the replication packgage" 3 "Self-cleaned data with self-built algo") rows(3) pos(6) size(medium))	///
+	title("Cohort Effects",size(large) color(black)) name(coh, replace) xsize(14) ysize(10)
+	
+** Time ** 
+
+* For time, has to normalize the effect in the first year to 1 first.
+
+gen F_per_time_all_orig = profile_year_all_orig[1]
+gen F_per_time_self_data_orig_algo = profile_year_self_data_orig_algo[1]
+gen F_per_time_all_self = profile_year_all_self[1]
+
+replace profile_year_all_orig = profile_year_all_orig/F_per_time_all_orig
+replace profile_year_self_data_orig_algo = profile_year_self_data_orig_algo/F_per_time_self_data_orig_algo
+replace profile_year_all_self = profile_year_all_self/F_per_time_all_self
+
+twoway (scatter profile_year_all_orig plot_year, msymbol(dh) mcolor(blue) msize(large) connect(l) lcolor(blue)) ///
+	(scatter profile_year_self_data_orig_algo plot_year, msymbol(oh) mcolor(red) msize(large) connect(l) lcolor(red)) /// 
+	(scatter profile_year_all_self plot_year, msymbol(th) mcolor(emerald) msize(large) connect(l) lcolor(emerald)),		///
+	xlabel(1985(5)2010,labsize(medium)) ylabel(1(1)4,labsize(medium)) 		/// 
+	xtitle("Year",size(medium)) ytitle("")	///
+	legend(order(1 "Results from the paper" 2 "Self-cleaned data with algo from the replication packgage" 3 "Self-cleaned data with self-built algo") rows(3) pos(6) size(medium))	///
+	title("Time Effects",size(large) color(black)) name(year, replace) xsize(14) ysize(10)
+	
+** Exporting the graph
+graph export "Figs\exp_fig4_three_outputs.jpg", name(exp) replace
+graph export "Figs\coh_fig4_three_outputs.jpg", name(coh) replace
+graph export "Figs\year_fig4_three_outputs.jpg", name(year) replace
