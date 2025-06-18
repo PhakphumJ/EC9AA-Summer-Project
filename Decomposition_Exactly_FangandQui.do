@@ -310,4 +310,4 @@ else{
 	display("Insufficient Number of Observation")
 }
 
-save "Data\Temp\HLT_results_CPS_1986_2012_identical_algo.dta"
+save "Data\Temp\HLT_results_CPS_1986_2012_identical_algo.dta", replace
