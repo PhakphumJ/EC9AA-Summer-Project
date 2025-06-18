@@ -75,7 +75,7 @@ global medreg 0			// whether perform median regression or not
 global ctrledu 0		// whether control education or not
 global min_obs 0		// set minumum number of observations in each year/experience bin. (Suggested 10 or >)
 global max_iter 50 		// maximum number of iteration (to stop if algorithm does not convergence)
-global precision 0.0001 // percentage gap between growth rates at convergence. 
+global precision 0.00001 // percentage gap between growth rates at convergence. 
 global dump 0.7 		// dumping factor useful to achieve convergence. Should be not too small relative to precision, or you get fake convergence. 
 global delta 0 			// depreciation rate for HLT
 global bin_coh 5		// length of cohort bins
@@ -144,6 +144,11 @@ gen growth_m_plusone = .
 
 ** Algorithm Loop
 while `diff' > $precision & `iter' < $max_iter{
+	// reset the profile
+	replace profile_wexp = .
+	replace profile_coh = .
+	replace profile_year = .
+	
 	if `iter' == 1{
 		gen growth_m = `g_0'
 	}
