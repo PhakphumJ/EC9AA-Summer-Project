@@ -1,13 +1,12 @@
 *** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4) ***
+** But, now use the whole available periods of CPS data (1961 - 2023).
 
 clear
 cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
 use "Data\CPS_Cleaned.dta"
 
-*** Let's try to do figure 4 exactly first. Hence, use data from 1986 - 2012. And restrict sample to those born from 1935 - 1984
-
-keep if year >= 1986 & year <= 2012
-keep if ybirth >= 1935 & ybirth <= 1984
+keep if year >= 1961 & year <= 2023
+keep if ybirth >= 1910 & ybirth <= 1994 // 17 cohorts. 
 
 * gen exp bins
 egen wexp_group = cut(exp_baseline), at(0(5)40) // working life = 40 yrs old. Incrementing from 0 by 5 each step.
@@ -267,4 +266,4 @@ keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not
 keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
 drop profile*plot
 
-save "Data\Temp\HLT_results_CPS_1986_2012.dta", replace
+save "Data\Temp\HLT_results_CPS_1961_2023.dta", replace
