@@ -4,6 +4,7 @@ clear
 cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
 use "Data\US_Census_Cleaned.dta"
 
+drop sex incwage realwage CPI eduyrs income_bottom2_5pct income_top2_5pct outlier // not useful anymore.
 
 rename birthyr ybirth
 keep if year >= 1939 & year <= 2022
@@ -44,6 +45,7 @@ gen coh_rlb = .
 foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from the first, then incrementing by 1 each time.
 	replace coh_rlb = `num' if d_c`num' == 1
 }
+drop d_c* // to reduce memory usage.
 
 ** Create Deaton's time vriables.
 * gen time dummy (This is only used for relabelling later on and create Deaton's time dummy)
@@ -63,13 +65,15 @@ gen year_rlb = year - 1938
 * gen Deaton's time variables.
 foreach num of numlist 3(1) `n_year' {
 	// dt* = dt-(t-1)*d2+(t-2)*d1		[see Deaton(1997, p126) equation (2.95)]
-	gen d_t`num'star=d_t`num'-(`num'-1)*d_t2+(`num'-2)*d_t1
+	gen dea_t`num'star=d_t`num'-(`num'-1)*d_t2+(`num'-2)*d_t1
 }
+
+drop d_t* // to reduce memory usage.
 
 * Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
 bys year: egen tot_pers =sum(perwt)
 replace perwt = perwt/tot_pers			
-bys year: egen av_perwt = mean(perwt)
+drop tot_pers
 
 ********************************************************************************
 * 1. PARAMETERS 
@@ -86,29 +90,6 @@ global bin_wexp 5		// length of experience bins
 global max_wexp 40		// maximum years of experience of interest [should be multiple of $bin_coh]
 global flat_start 6		// starting point for flat spot (the 7th and 8th bins)
 global flat_end 8		// ending point for flat spot
-
-********************************************************************************
-* 2. Creating temp variables for checking num. of obs. before running the algo. 
-********************************************************************************
-
-* Check that there is sufficient number of observations in each year-experience bin
-*** (1) the minimal number of observations among all year-experience bins > $min_obs
-gen one_temp = 1
-sort year wexp_group
-egen group_temp = group(year wexp_group) // create pair numbers (year-experience bin pairs)
-bysort group_temp: egen bin_obs_temp = sum(one_temp)	// bin_obs_temp: number of observations in each year-experience bin
-egen bin_obs_temp_min = min(bin_obs_temp)			// bin_obs_temp_min: the minimal number of observations among all year-experience bins
-
-*** (2) number of experience groups
-tab wexp_group
-local num_wexp = r(r)								// `num_wexp': number of experience groups
-
-*** (3) number of experience groups per year
-tab year
-local n_year = r(r)
-tab group_temp
-local n_group = r(r)
-local n_wexp_per_year = `n_group' / `n_year_true'
 
 
 ********************************************************************************
@@ -133,9 +114,7 @@ gen wexp_low = . //(exp effect in the first bin of the flat part)
 gen profile_wexp = .
 gen profile_coh = .
 gen profile_year = .
-gen profile_wexp_plot = . // These will be x-axis
-gen profile_coh_plot = .
-gen profile_year_plot = .
+gen profile_year_plot = . // These will be x-axis
 
 * Intitial guess g_0
 reg logrealwage i.wexp_group year_rlb
@@ -164,7 +143,7 @@ while `diff' > $precision & `iter' < $max_iter{
 	gen Def_logrealwage_temp = logrealwage - growth_m*(year_rlb - 1)
 	
 	* Decomposing (the main regression)
-	reg Def_logrealwage_temp i.wexp_group i.coh_rlb d_*star [pweight=perwt] // (they used aweight, I think pweight is more appropriate) 
+	reg Def_logrealwage_temp i.wexp_group i.coh_rlb dea_*star [pweight=perwt] // (they used aweight, I think pweight is more appropriate) 
 	
 	replace cons_term = _b[_cons]
 	mat coef_mat=e(b) // store the estimated coeff in a matrix.
@@ -173,22 +152,18 @@ while `diff' > $precision & `iter' < $max_iter{
 	local n_year2 = `n_year' - 2 // number of effective coefficients for period.
 
 	replace profile_wexp = 0 if _n == 1 // (since it is the base group) (_n is the row number)
-	replace profile_wexp_plot = 1 if _n == 1
 	replace profile_year_plot = 1 if _n == 1
 	replace profile_year_plot = 2 if _n == 2
 
 	* Experience Profile
 	foreach num of numlist 2(1)`n_wexp' { // have to start from 2 since the first is the coeff of base group, which is = 0.
 		replace profile_wexp = coef_mat[1,`num'] if _n==`num' //accesing the first row, and `num' column of the matrix. This works since we put the coefficients of exp bins to come first.
-		replace profile_wexp_plot = `num' if _n==`num'
 	}
 
 	* Cohort Profile
 	replace profile_coh = 0 if _n == 1 // since it is the base group.
-	replace profile_coh_plot = 1 if _n == 1
 	foreach num of numlist 2(1)`n_cohort' { // have to start from 2 since the first is the coeff of base group, which is = 0.
 		replace profile_coh = coef_mat[1, `n_wexp' + `num'] if _n==`num' // since the coeff of cohort come after the coeff of experience groups.
-		replace profile_coh_plot = `num'  if _n==`num'
 	}
 
 	* Year Profile (Note: this step takes into account that repeated cross-section might be NOT at an yearly frequency)
