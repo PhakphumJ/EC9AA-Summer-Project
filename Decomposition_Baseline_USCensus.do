@@ -221,7 +221,7 @@ gen iter = `iter' - 1
 // Hence, we want s_y to be 1,11,21,31,41,51,61,62-84 instead of (1,2,...30)
 gen s_y_relabel = s_y 
 foreach num of numlist 2(1)7{
-	replace s_y_relabel = s_y_relabel[1] + 10 if _n == `num'
+	replace s_y_relabel = s_y_relabel[1] + (`num' - 1)*10 if _n == `num'
 }
 foreach num of numlist 8(1)`n_year'{
 	replace s_y_relabel = s_y_relabel + 54 if _n == `num'
