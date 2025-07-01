@@ -15,7 +15,7 @@ drop serial month cpsid asecflag hflag statecensus pernum cpsidp cpsidv asecwth
 drop race marst occ ind inctot incbus incfarm inclongj oincbus oincfarm oincwage
 
 * subtract 1 from year and age (since income variable is the income earned last year)
-replace age = age - 1
+*replace age = age - 1
 replace year = year - 1
 
 * count obs b/w 1986 - 2012

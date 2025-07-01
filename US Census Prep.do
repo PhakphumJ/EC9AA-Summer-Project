@@ -8,11 +8,9 @@ clear
 cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data"
 use usa_census_smallest.dta
 
-* drop those with missing wages or invalid wages
-drop if incwage == 999999 | incwage == 999998 | incwage == .
+* replacing incwage missing wages and zero wages with NA.
+replace incwage = . if incwage == 999999 | incwage == 999998 | incwage == 0 | incwage == . 
 
-* drop those with wage = 0
-drop if incwage == 0
 
 * Replace perwt with expwtp in year where expwtp is available. 
 replace perwt = expwtp if expwtp != .
@@ -35,7 +33,9 @@ gen realwage = incwage/CPI
 gen logrealwage = log(realwage)
 
 * Create imputed years of schooling
-drop if educd == . | educd == 999  // drop missing or unknown level of educations
+replace educd = . if educd == 1 // replace 1 with NA.
+
+replace educd = . if educd == 999  // replace 999 with NA.
 
 
 gen eduyrs = . // Create the new variable. Using the same logic in the replication packgage.

@@ -124,7 +124,7 @@ clear
 use "Data\Temp\HLT_results_CPS_1986_2012_all_self_profile.dta"
 merge 1:1 plot_year using "Data\Temp\HLT_results_CPS_1961_2023_profile.dta", nogenerate 
 sort plot_year
-merge 1:1 plot_year using "Data\Temp\HLT_results_USCensus.dta_profile.dta", nogenerate 
+merge 1:1 plot_year using "Data\Temp\HLT_results_USCensus_profile.dta", nogenerate 
 sort plot_year
 * To compare have to normalize. Cohort Effects of 1935 to be 1. Time Effects of 1986 to be 1. Experience effects need no further normalization. After that we would need to subset the date for plotting.
 
