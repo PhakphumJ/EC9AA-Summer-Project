@@ -26,24 +26,15 @@ count if year >= 1986 & year <= 2012
 * 
 keep if year >= 1986 & year <= 2012
 
-* drop those with weight < 0 (Note: These are valid weights)
-drop if asecwt < 0 // there are only a few obs with negative weight.
-* drop those with missing wages or invalid wages
-drop if incwage == 99999999 | incwage == 99999998 | incwage == .
 
-* drop those with wage = 0
-drop if incwage == 0
+* create male variable
+gen male = sex
+replace male = 0 if sex == 2
 
-* create real wage variable and its log
-merge m:1 year using "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data\CPI_1913_to_2024_cleaned.dta"
-keep if _merge == 1 | _merge == 3
-drop _merge
 
-gen realwage = incwage/CPI
-gen logrealwage = log(realwage)
 
 * Create imputed years of schooling
-drop if educ == . | educ == 999  // drop missing or unknown level of educations
+replace educ = . if educ == 1 // replace 1 with NA.
 
 
 gen eduyrs = . // Create the new variable. Using the same logic in the replication packgage.
@@ -62,6 +53,23 @@ gen ybirth = year - age
 
 * create experience variable
 gen exp_baseline = min(age - eduyrs - 6, age - 18)
+
+
+* replacing incwage missing wages and zero wages with NA.
+replace incwage = . if incwage == 99999999 | incwage == 99999998 | incwage == 0 | incwage == . 
+
+
+
+* create real wage variable and its log
+merge m:1 year using "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data\CPI_1913_to_2024_cleaned.dta"
+keep if _merge == 1 | _merge == 3
+drop _merge
+
+
+gen realwage = incwage/CPI
+gen logrealwage = log(realwage)
+
+
 
 * create outlier flag
 // Calculate the 2.5th and 97.5th percentile income for each year
