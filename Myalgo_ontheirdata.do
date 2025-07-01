@@ -8,8 +8,11 @@ rename lnearnings logrealwage
 
 *** Let's try to do figure 4 exactly first. Hence, use data from 1986 - 2012. And restrict sample to those born from 1935 - 1984
 
+drop if outlier
+keep if male == 1
 keep if year >= 1986 & year <= 2012
 keep if ybirth >= 1935 & ybirth <= 1984
+
 
 * gen exp bins
 gen exp_baseline = min(age - eduyrs - 6, age - 18)
