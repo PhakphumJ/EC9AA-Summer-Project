@@ -12,7 +12,7 @@ use cps_00004.dta
 drop serial month cpsid asecflag hflag statecensus pernum cpsidp cpsidv asecwth
 
 * drop irrelevant variables (for this exercise)
-drop race marst occ ind inctot incbus incfarm inclongj oincbus oincfarm oincwage
+drop race marst occ ind inctot incbus incfarm inclongj oincbus oincfarm oincwage empstat labforce uhrsworkt statefip
 
 * subtract 1 from year and age (since income variable is the income earned last year)
 *replace age = age - 1
@@ -70,7 +70,7 @@ foreach y of local years_list {
     display "Processing year: `y'" 
     
     // Calculate 2.5th and 97.5th percentiles for the current year
-    _pctile incwage [pweight=asecwt] if year == `y', percentiles(2.5 97.5)
+    _pctile incwage if year == `y', percentiles(2.5 97.5)
     
     local p2_5 = r(r1)
     local p97_5 = r(r2)
@@ -81,10 +81,10 @@ foreach y of local years_list {
     
     // Generate the flags for the current year
     
-    replace income_bottom2_5pct = (incwage <= `p2_5') if year == `y'
+    replace income_bottom2_5pct = (incwage < `p2_5') if year == `y' & incwage != .
     
 
-    replace income_top2_5pct = (incwage >= `p97_5') if year == `y'	
+    replace income_top2_5pct = (incwage > `p97_5') if year == `y'	& incwage != .
 }
 
 // Generate the outlier flag
@@ -96,7 +96,7 @@ keep if sex == 1
 * drop outlier
 drop if outlier == 1
 
-count if year >= 1986 & year <= 2012 // I expect to have 1,127,840 obs. But only got 1,121,224 obs. The difference might come from how the outlier flag is constructed.
+count if year >= 1986 & year <= 2012 // I expect to have 2,238,116 obs. Got the same number now.
 
 ** Export the data
 save "CPS_Cleaned.dta", replace 
