@@ -62,6 +62,9 @@ foreach num of numlist 3(1) `n_year' {
 	gen d_t`num'star=d_t`num'-(`num'-1)*d_t2+(`num'-2)*d_t1
 }
 
+* Drop those with missing values
+drop if wexp_group == . | eduyrs == . | logrealwage == . | ybirth == .
+
 * Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
 rename asecwt perwt
 bys year: egen tot_pers =sum(perwt)
