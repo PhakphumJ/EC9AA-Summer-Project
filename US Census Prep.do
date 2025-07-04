@@ -5,11 +5,8 @@
 
 *** Preparing the data
 clear
-cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data"
+cd "/home/phakphum/WarwickPhD/EC9AA Summer Project/Data"
 use usa_census_smallest.dta
-
-* replacing incwage missing wages and zero wages with NA.
-replace incwage = . if incwage == 999999 | incwage == 999998 | incwage == 0 | incwage == . 
 
 
 * Replace perwt with expwtp in year where expwtp is available. 
@@ -17,15 +14,19 @@ replace perwt = expwtp if expwtp != .
 drop expwtp statefip
 
 * subtract 1 from year and age (since income variable is the income earned last year)
-replace age = age - 1
+*replace age = age - 1
 replace year = year - 1
 
 * drop those with weight < 0 (Note: These are valid weights)
 drop if perwt < 0 // there are no obs with negative weight in the census.
 
 
-* create real wage variable and its log
-merge m:1 year using "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data\CPI_1913_to_2024_cleaned.dta"
+** create real wage variable and its log
+* replacing incwage missing wages and zero wages with NA.
+replace incwage = . if incwage == 999999 | incwage == 999998 | incwage == 0 | incwage == . 
+
+
+merge m:1 year using "CPI_1913_to_2024_cleaned.dta"
 keep if _merge == 1 | _merge == 3
 drop _merge
 
@@ -64,7 +65,7 @@ foreach y of local years_list {
     display "Processing year: `y'" 
     
     // Calculate 2.5th and 97.5th percentiles for the current year
-    _pctile incwage [pweight=perwt] if year == `y', percentiles(2.5 97.5)
+    _pctile incwage if year == `y', percentiles(2.5 97.5)
     
     local p2_5 = r(r1)
     local p97_5 = r(r2)
@@ -75,10 +76,10 @@ foreach y of local years_list {
     
     // Generate the flags for the current year
     
-    replace income_bottom2_5pct = (incwage <= `p2_5') if year == `y'
+    replace income_bottom2_5pct = (incwage < `p2_5') if year == `y' & incwage != .
     
 
-    replace income_top2_5pct = (incwage >= `p97_5') if year == `y'	
+    replace income_top2_5pct = (incwage > `p97_5') if year == `y' & incwage != .
 }
 
 // Generate the outlier flag

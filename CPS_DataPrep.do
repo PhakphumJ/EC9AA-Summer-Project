@@ -5,7 +5,7 @@
 
 *** Preparing the data
 clear
-cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data"
+cd "/home/phakphum/WarwickPhD/EC9AA Summer Project/Data"
 use cps_00004.dta
 
 * drop irrelevant variables (for all analysis)
@@ -32,7 +32,7 @@ drop if asecwt < 0 // there are only a few obs with negative weight.
 * replacing incwage missing wages and zero wages with NA.
 replace incwage = . if incwage == 99999999 | incwage == 99999998 | incwage == 0 | incwage == . 
 
-merge m:1 year using "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data\CPI_1913_to_2024_cleaned.dta"
+merge m:1 year using "CPI_1913_to_2024_cleaned.dta"
 keep if _merge == 1 | _merge == 3
 drop _merge
 
