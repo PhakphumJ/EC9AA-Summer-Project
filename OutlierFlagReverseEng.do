@@ -1,8 +1,8 @@
 *** This is for trying to reverse engineer how to create outlier flag. *** 
 
 clear
-cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Replication Package"
-use "data\US.dta"
+cd "/home/phakphum/WarwickPhD/EC9AA Summer Project/Replication Package"
+use "data/US.dta"
 
 * create outlier flag
 // Calculate the 2.5th and 97.5th percentile income for each year

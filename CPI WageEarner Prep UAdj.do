@@ -1,7 +1,7 @@
 ** This do-file is for cleaning CPI data
 
 clear
-cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data"
+cd "/home/phakphum/WarwickPhD/EC9AA Summer Project/Data"
 * Extract only the year
 import delimited "CWUR0000SA0_NBD20150101.csv"
 gen year = substr(observation_date ,1,4)

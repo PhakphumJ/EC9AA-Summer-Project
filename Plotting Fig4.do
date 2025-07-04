@@ -9,9 +9,9 @@
 ** Merge the three datasets containing the results. Can do this using plot_year as the key variable. Want to bring in profile_wexp, profile_coh, and profile_year.
 
 clear
-cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
 
-use "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Replication Package\temp\us_HLToutput.dta"
+use "Replication Package/temp/us_HLToutput.dta"
 
 keep profile_wexp plot_wexp profile_coh plot_coh profile_year plot_year // keep only relevant variables
 
@@ -20,32 +20,32 @@ keep profile_wexp plot_wexp profile_coh plot_coh profile_year plot_year // keep 
 foreach var of varlist profile_wexp profile_coh profile_year {
     rename `var' `var'_all_orig
 }
-save "Data\Temp\HLT_results_CPS_1986_2012_all_orig_profile.dta", replace
+save "Data/Temp/HLT_results_CPS_1986_2012_all_orig_profile.dta", replace
 clear
 
 * Do the same with the other two datasets.
-use "Data\Temp\HLT_results_CPS_1986_2012_identical_algo.dta"
+use "Data/Temp/HLT_results_CPS_1986_2012_identical_algo.dta"
 keep profile_wexp plot_wexp profile_coh plot_coh profile_year plot_year
 foreach var of varlist profile_wexp profile_coh profile_year {
     rename `var' `var'_self_data_orig_algo
 }
-save "Data\Temp\HLT_results_CPS_1986_2012_self_data_orig_algo_profile.dta", replace
+save "Data/Temp/HLT_results_CPS_1986_2012_self_data_orig_algo_profile.dta", replace
 clear
 
 
-use "Data\Temp\HLT_results_CPS_1986_2012.dta"
+use "Data/Temp/HLT_results_CPS_1986_2012.dta"
 keep profile_wexp plot_wexp profile_coh plot_coh profile_year plot_year
 foreach var of varlist profile_wexp profile_coh profile_year {
     rename `var' `var'_all_self
 }
-save "Data\Temp\HLT_results_CPS_1986_2012_all_self_profile.dta", replace
+save "Data/Temp/HLT_results_CPS_1986_2012_all_self_profile.dta", replace
 clear
 
 
 * Merging 
-use "Data\Temp\HLT_results_CPS_1986_2012_all_orig_profile.dta"
-merge 1:1 plot_year using "Data\Temp\HLT_results_CPS_1986_2012_self_data_orig_algo_profile.dta", keepusing(profile_wexp* profile_coh* profile_year*) nogenerate 
-merge 1:1 plot_year using "Data\Temp\HLT_results_CPS_1986_2012_all_self_profile.dta", keepusing(profile_wexp* profile_coh* profile_year*) nogenerate 
+use "Data/Temp/HLT_results_CPS_1986_2012_all_orig_profile.dta"
+merge 1:1 plot_year using "Data/Temp/HLT_results_CPS_1986_2012_self_data_orig_algo_profile.dta", keepusing(profile_wexp* profile_coh* profile_year*) nogenerate 
+merge 1:1 plot_year using "Data/Temp/HLT_results_CPS_1986_2012_all_self_profile.dta", keepusing(profile_wexp* profile_coh* profile_year*) nogenerate 
 
 *** Plotting ***
 ** Experience **
@@ -94,41 +94,41 @@ twoway (scatter profile_year_all_orig plot_year, msymbol(dh) mcolor(blue) msize(
 	title("Time Effects",size(large) color(black)) name(year, replace) xsize(14) ysize(10)
 	
 ** Exporting the graph
-graph export "Figs\exp_fig4_three_outputs.jpg", name(exp) replace
-graph export "Figs\coh_fig4_three_outputs.jpg", name(coh) replace
-graph export "Figs\year_fig4_three_outputs.jpg", name(year) replace
+graph export "Figs/exp_fig4_three_outputs.jpg", name(exp) replace
+graph export "Figs/coh_fig4_three_outputs.jpg", name(coh) replace
+graph export "Figs/year_fig4_three_outputs.jpg", name(year) replace
 
 ** Combine and export 
 graph combine exp coh year,	xsize(20) ysize(8) row(1) 
-graph export "Figs\Comparison_three_outputs_combined.jpg", replace
+graph export "Figs/Comparison_three_outputs_combined.jpg", replace
 
 *******************************************************************************************************
 * Now, let's compare the results from (1) CPS 1986-2012 data (2) CPS 1961-2023 data (3) US Census data 
 *******************************************************************************************************
 clear
-use "Data\Temp\HLT_results_CPS_1961_2023.dta"
+use "Data/Temp/HLT_results_CPS_1961_2023.dta"
 keep profile_wexp plot_wexp profile_coh plot_coh profile_year plot_year
 foreach var of varlist * {
     rename `var' `var'_all_period
 }
 rename plot_year_all_period plot_year
-save "Data\Temp\HLT_results_CPS_1961_2023_profile.dta", replace
+save "Data/Temp/HLT_results_CPS_1961_2023_profile.dta", replace
 
 clear
-use "Data\Temp\HLT_results_USCensus.dta"
+use "Data/Temp/HLT_results_USCensus.dta"
 keep profile_wexp plot_wexp profile_coh plot_coh profile_year plot_year
 foreach var of varlist * {
     rename `var' `var'_USCensus
 }
 rename plot_year_USCensus plot_year
-save "Data\Temp\HLT_results_USCensus_profile.dta", replace
+save "Data/Temp/HLT_results_USCensus_profile.dta", replace
 
 ** Merging
 clear
-use "Data\Temp\HLT_results_CPS_1986_2012_all_self_profile.dta"
-merge 1:1 plot_year using "Data\Temp\HLT_results_CPS_1961_2023_profile.dta", nogenerate 
+use "Data/Temp/HLT_results_CPS_1986_2012_all_self_profile.dta"
+merge 1:1 plot_year using "Data/Temp/HLT_results_CPS_1961_2023_profile.dta", nogenerate 
 sort plot_year
-merge 1:1 plot_year using "Data\Temp\HLT_results_USCensus_profile.dta", nogenerate 
+merge 1:1 plot_year using "Data/Temp/HLT_results_USCensus_profile.dta", nogenerate 
 sort plot_year
 * To compare have to normalize. Cohort Effects of 1935 to be 1. Time Effects of 1986 to be 1. Experience effects need no further normalization. After that we would need to subset the date for plotting.
 
@@ -191,13 +191,13 @@ title("Time Effects (1989 = 1)",size(large) color(black)) name(year2, replace) x
 
 
 ** Exporting the graph
-graph export "Figs\exp_fig4_three_USdata.jpg", name(exp2) replace
-graph export "Figs\coh_fig4_three_USdata.jpg", name(coh2) replace
-graph export "Figs\year_fig4_three_USdata.jpg", name(year2) replace
+graph export "Figs/exp_fig4_three_USdata.jpg", name(exp2) replace
+graph export "Figs/coh_fig4_three_USdata.jpg", name(coh2) replace
+graph export "Figs/year_fig4_three_USdata.jpg", name(year2) replace
 
 **** Next, let's plot just the results from all CPS periods. ****
 clear
-use "Data\Temp\HLT_results_CPS_1961_2023_profile.dta"
+use "Data/Temp/HLT_results_CPS_1961_2023_profile.dta"
 
 ** Experience **
 replace plot_wexp_all_period = plot_wexp_all_period + 2.5 // This is the shift the point to the middle of the bins.
@@ -232,12 +232,12 @@ title("Time Effects using 1961-2023 data",size(large) color(black)) name(year3, 
 
 ** Combine and export 
 graph combine exp3 coh3 year3,	xsize(20) ysize(8) row(1) 
-graph export "Figs\CPS_all_periods_results.jpg", replace	
+graph export "Figs/CPS_all_periods_results.jpg", replace	
 
 
 **** Next, let's plot just the results from Census Data. ****
 clear
-use "Data\Temp\HLT_results_USCensus_profile.dta"
+use "Data/Temp/HLT_results_USCensus_profile.dta"
 
 ** Experience **
 replace plot_wexp_USCensus = plot_wexp_USCensus + 2.5 // This is the shift the point to the middle of the bins.
@@ -272,24 +272,24 @@ title("Time Effects using US Census data",size(large) color(black)) name(year4, 
 
 ** Combine and export 
 graph combine exp4 coh4 year4,	xsize(20) ysize(8) row(1) 
-graph export "Figs\USCensus_results.jpg", replace
+graph export "Figs/USCensus_results.jpg", replace
 
 
 *******************************************************************************************************
 * Let's plot the results of running my algo on thier data. 
 *******************************************************************************************************
 clear
-use "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Replication Package\Temp2\Myalgo_ontheirdata.dta"
+use "/home/phakphum/WarwickPhD/EC9AA Summer Project/Replication Package/Temp2/Myalgo_ontheirdata.dta"
 keep profile_wexp plot_wexp profile_coh plot_coh profile_year plot_year
 foreach var of varlist profile_wexp profile_coh profile_year {
     rename `var' `var'_Myalgo_ontheirdata
 }
-save "Data\Temp\Myalgo_ontheirdata_profile.dta", replace
+save "Data/Temp/Myalgo_ontheirdata_profile.dta", replace
 
 
 ** Merge the datasets
 clear
-use "Data\Temp\HLT_results_CPS_1986_2012_all_orig_profile.dta"
+use "Data/Temp/HLT_results_CPS_1986_2012_all_orig_profile.dta"
 merge 1:1 plot_year using "Data\Temp\Myalgo_ontheirdata_profile.dta", keepusing(profile_wexp* profile_coh* profile_year*) nogenerate 
 
 *** Plotting ***
@@ -335,4 +335,4 @@ twoway (scatter profile_year_all_orig plot_year, msymbol(dh) mcolor(blue) msize(
 
 ** Combine and export 
 graph combine exp5 coh5 year5,	xsize(20) ysize(8) row(1) 
-graph export "Figs\Comparison_myalgo_origresults.jpg", replace
+graph export "Figs/Comparison_myalgo_origresults.jpg", replace

@@ -2,8 +2,8 @@
 ** But, now use the whole available periods of CPS data (1961 - 2023).
 
 clear
-cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
-use "Data\CPS_Cleaned.dta"
+cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
+use "Data/CPS_Cleaned.dta"
 
 keep if year >= 1961 & year <= 2023
 keep if ybirth >= 1910 & ybirth <= 1994 // 17 cohorts. 
@@ -61,21 +61,23 @@ foreach num of numlist 3(1) `n_year' {
 	gen d_t`num'star=d_t`num'-(`num'-1)*d_t2+(`num'-2)*d_t1
 }
 
+* Drop those with missing values
+drop if wexp_group == . | eduyrs == . | logrealwage == . | ybirth == .
+
 * Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
 rename asecwt perwt
 bys year: egen tot_pers =sum(perwt)
 replace perwt = perwt/tot_pers			
 bys year: egen av_perwt = mean(perwt)
-
 ********************************************************************************
 * 1. PARAMETERS 
 ********************************************************************************
 global medreg 0			// whether perform median regression or not
 global ctrledu 0		// whether control education or not
 global min_obs 0		// set minumum number of observations in each year/experience bin. (Suggested 10 or >)
-global max_iter 50 		// maximum number of iteration (to stop if algorithm does not convergence)
-global precision 0.0001 // percentage gap between growth rates at convergence. 
-global dump 0.7 		// dumping factor useful to achieve convergence. Should be not too small relative to precision, or you get fake convergence. 
+global max_iter 200 		// maximum number of iteration (to stop if algorithm does not convergence)
+global precision 0.001 // percentage gap between growth rates at convergence. 
+global dump 1.5 		// dumping factor useful to achieve convergence. Should be not too small relative to precision, or you get fake convergence. 
 global delta 0 			// depreciation rate for HLT
 global bin_coh 5		// length of cohort bins
 global bin_wexp 5		// length of experience bins
@@ -266,4 +268,4 @@ keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not
 keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
 drop profile*plot
 
-save "Data\Temp\HLT_results_CPS_1961_2023.dta", replace
+save "Data/Temp/HLT_results_CPS_1961_2023.dta", replace

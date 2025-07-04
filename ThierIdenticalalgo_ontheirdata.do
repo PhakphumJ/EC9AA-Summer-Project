@@ -1,8 +1,8 @@
 *** Next, let's to do with their algorithm exactly. *** 
 
 clear
-cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Replication Package"
-use "data\US.dta"
+cd "/home/phakphum/WarwickPhD/EC9AA Summer Project/Replication Package"
+use "data/US.dta"
 
 
 
@@ -316,4 +316,4 @@ else{
 	display("Insufficient Number of Observation")
 }
 
-save "Temp2\Theiridenticalalgo_ontheirdata.dta", replace
+save "Temp2/Theiridenticalalgo_ontheirdata.dta", replace

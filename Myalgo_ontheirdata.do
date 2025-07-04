@@ -1,8 +1,8 @@
 *** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4) ***
 
 clear
-cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Replication Package"
-use "data\US.dta"
+cd "/home/phakphum/WarwickPhD/EC9AA Summer Project/Replication Package"
+use "data/US.dta"
 
 rename lnearnings logrealwage
 
@@ -273,4 +273,4 @@ keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not
 keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
 drop profile*plot
 
-save "Temp2\Myalgo_ontheirdata.dta", replace
+save "Temp2/Myalgo_ontheirdata.dta", replace

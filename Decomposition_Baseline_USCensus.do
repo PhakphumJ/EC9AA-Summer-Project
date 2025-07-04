@@ -1,8 +1,8 @@
 *** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4) ***
 ** Using Census Data **
 clear
-cd "E:\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
-use "Data\US_Census_Cleaned.dta"
+cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
+use "Data/US_Census_Cleaned.dta"
 
 drop sex incwage realwage CPI eduyrs income_bottom2_5pct income_top2_5pct outlier // not useful anymore.
 
@@ -69,6 +69,9 @@ foreach num of numlist 3(1) `n_year' {
 }
 
 drop d_t* // to reduce memory usage.
+
+* Drop those with missing values
+drop if wexp_group == . | eduyrs == . | logrealwage == . | ybirth == .
 
 * Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
 bys year: egen tot_pers =sum(perwt)
@@ -257,4 +260,4 @@ keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not
 keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
 drop profile*plot
 
-save "Data\Temp\HLT_results_USCensus.dta", replace
+save "Data/Temp/HLT_results_USCensus.dta", replace
