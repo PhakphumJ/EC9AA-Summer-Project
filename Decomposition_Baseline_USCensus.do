@@ -4,7 +4,7 @@ clear
 cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
 use "Data/US_Census_Cleaned.dta"
 
-drop sex incwage realwage CPI eduyrs income_bottom2_5pct income_top2_5pct outlier // not useful anymore.
+drop sex incwage realwage CPI income_bottom2_5pct income_top2_5pct outlier // not useful anymore.
 
 rename birthyr ybirth
 keep if year >= 1939 & year <= 2022
@@ -72,6 +72,7 @@ drop d_t* // to reduce memory usage.
 
 * Drop those with missing values
 drop if wexp_group == . | eduyrs == . | logrealwage == . | ybirth == .
+drop eduyrs
 
 * Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
 bys year: egen tot_pers =sum(perwt)
