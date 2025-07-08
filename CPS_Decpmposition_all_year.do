@@ -5,7 +5,6 @@ clear
 cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
 use "Data/CPS_Cleaned.dta"
 
-keep if year >= 1961 & year <= 2023
 keep if ybirth >= 1910 & ybirth <= 1994 // 17 cohorts. 
 
 * gen exp bins
@@ -43,6 +42,7 @@ gen coh_rlb = .
 foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from the first, then incrementing by 1 each time.
 	replace coh_rlb = `num' if d_c`num' == 1
 }
+drop d_c* // to reduce memory usage.
 
 ** Create Deaton's time vriables.
 * gen time dummy (This is only used for relabelling later on and create Deaton's time dummy)
@@ -58,8 +58,10 @@ foreach num of numlist 1(1)`n_year'{
 * gen Deaton's time variables.
 foreach num of numlist 3(1) `n_year' {
 	// dt* = dt-(t-1)*d2+(t-2)*d1		[see Deaton(1997, p126) equation (2.95)]
-	gen d_t`num'star=d_t`num'-(`num'-1)*d_t2+(`num'-2)*d_t1
+	gen dea_t`num'star=d_t`num'-(`num'-1)*d_t2+(`num'-2)*d_t1
 }
+
+drop d_t* // to reduce memory usage.
 
 * Drop those with missing values
 drop if wexp_group == . | eduyrs == . | logrealwage == . | ybirth == .
@@ -75,9 +77,9 @@ bys year: egen av_perwt = mean(perwt)
 global medreg 0			// whether perform median regression or not
 global ctrledu 0		// whether control education or not
 global min_obs 0		// set minumum number of observations in each year/experience bin. (Suggested 10 or >)
-global max_iter 200 		// maximum number of iteration (to stop if algorithm does not convergence)
+global max_iter 1500 		// maximum number of iteration (to stop if algorithm does not convergence)
 global precision 0.001 // percentage gap between growth rates at convergence. 
-global dump 1.5 		// dumping factor useful to achieve convergence. Should be not too small relative to precision, or you get fake convergence. 
+global dump 0.7 		// dumping factor useful to achieve convergence. Should be not too small relative to precision, or you get fake convergence. 
 global delta 0 			// depreciation rate for HLT
 global bin_coh 5		// length of cohort bins
 global bin_wexp 5		// length of experience bins
@@ -162,7 +164,7 @@ while `diff' > $precision & `iter' < $max_iter{
 	gen Def_logrealwage_temp = logrealwage - growth_m*(year_rlb - 1)
 	
 	* Decomposing (the main regression)
-	reg Def_logrealwage_temp i.wexp_group i.coh_rlb d_*star [pweight=perwt] // (they used aweight, I think pweight is more appropriate) 
+	reg Def_logrealwage_temp i.wexp_group i.coh_rlb dea_*star [pweight=perwt] // (they used aweight, I think pweight is more appropriate) 
 	
 	replace cons_term = _b[_cons]
 	mat coef_mat=e(b) // store the estimated coeff in a matrix.
