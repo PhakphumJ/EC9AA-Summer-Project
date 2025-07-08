@@ -140,12 +140,12 @@ gen coh_effect_1935_Census = profile_coh_USCensus[45] // it's in the 45th row.
 gen profile_coh_USCensus_norm = profile_coh_USCensus/coh_effect_1935_Census
 
 * Normalizing the time effect. 1989 to 1 (since the census does not have year 1986)
-gen time_effect_1935_sub = profile_year_all_self[32] // it's in the 32th row.
-gen profile_year_self_sub_norm = profile_year_all_self/time_effect_1935_sub
-gen time_effect_1935_all = profile_year_all_period[32] // it's in the 33th row.
-gen profile_year_all_period_norm = profile_year_all_period/time_effect_1935_all
-gen time_effect_1935_USCensus = profile_year_USCensus[32] // it's in the 33th row.
-gen profile_year_USCensus_norm = profile_year_USCensus/time_effect_1935_USCensus
+gen time_effect_1989_sub = profile_year_all_self[31] // it's in the 31th row.
+gen profile_year_self_sub_norm = profile_year_all_self/time_effect_1989_sub
+gen time_effect_1989_all = profile_year_all_period[31] // it's in the 31th row.
+gen profile_year_all_period_norm = profile_year_all_period/time_effect_1989_all
+gen time_effect_1989_USCensus = profile_year_USCensus[31] // it's in the 31th row.
+gen profile_year_USCensus_norm = profile_year_USCensus/time_effect_1989_USCensus
 
 
 *** Plotting the comparisons *** 
