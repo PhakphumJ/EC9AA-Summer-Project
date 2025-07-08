@@ -6,6 +6,7 @@ cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
 use "Data/CPS_Cleaned.dta"
 
 keep if ybirth >= 1910 & ybirth <= 1994 // 17 cohorts. 
+drop if year == 1962 // since 'educ' is not available.
 
 * gen exp bins
 egen wexp_group = cut(exp_baseline), at(0(5)40) // working life = 40 yrs old. Incrementing from 0 by 5 each step.
@@ -48,12 +49,16 @@ drop d_c* // to reduce memory usage.
 * gen time dummy (This is only used for relabelling later on and create Deaton's time dummy)
 tab year, g(d_t) // dummies for each year
 local n_year = r(r)	
+sum year
+local min_y = r(min)
+local max_y = r(max)
+local n_year_true = `max_y' - `min_y' + 1
+display "#disticnt years: `n_year' periods"
+display "#Length of the time period: `n_year_true' years"
 
 // relabel year to be from 1 to n_year instead of the actual year.
-gen year_rlb = .
-foreach num of numlist 1(1)`n_year'{
-	replace year_rlb = `num' if d_t`num' == 1
-}
+// Do year - 1960 instead since the inteval between is not constant. -> 1961 becomes 1
+gen year_rlb = year - 1960
 
 * gen Deaton's time variables.
 foreach num of numlist 3(1) `n_year' {
@@ -77,8 +82,8 @@ bys year: egen av_perwt = mean(perwt)
 global medreg 0			// whether perform median regression or not
 global ctrledu 0		// whether control education or not
 global min_obs 0		// set minumum number of observations in each year/experience bin. (Suggested 10 or >)
-global max_iter 1500 		// maximum number of iteration (to stop if algorithm does not convergence)
-global precision 0.001 // percentage gap between growth rates at convergence. 
+global max_iter 50 		// maximum number of iteration (to stop if algorithm does not convergence)
+global precision 0.0001 // percentage gap between growth rates at convergence. 
 global dump 0.7 		// dumping factor useful to achieve convergence. Should be not too small relative to precision, or you get fake convergence. 
 global delta 0 			// depreciation rate for HLT
 global bin_coh 5		// length of cohort bins
@@ -241,16 +246,23 @@ gen iter = `iter' - 1
 ********************************************************************************
 * 4. Prepare data for plotting (keeping only relevant variables and converting thing from log to levels)
 ********************************************************************************
+// cannot multiply (1,2,3..) to growth since the intervals b/w years are not equal.
+// The years are 1961, 1963, 1964, 1965, ...
+// Hence, we want s_y to be 1,3,4,... instead of (1,2,3,...30)
+gen s_y_relabel = s_y 
+replace s_y_relabel = s_y + 1
+replace s_y_relabel = 1 if _n == 1
+
 gen profile_year_cyc = profile_year // this is the cyclical part
 replace profile_year = profile_year*(s_y[1]) if _n==1 // the trend of time effects
-replace profile_year = profile_year*(s_y[_n] - s_y[_n - 1]) + growth_m*(s_y - s_y[1]) if _n >1 // time effect = trend + cylical
+replace profile_year = profile_year*(s_y[_n] - s_y[_n - 1]) + growth_m*(s_y_relabel - s_y_relabel[1]) if _n >1 // time effect = trend + cylical// time effect = trend + cylical
 replace profile_wexp = exp(profile_wexp) // converting to levels
 replace profile_year = exp(profile_year) // converting to levels
 replace profile_coh = exp(profile_coh) // converting to levels
 
 
 egen min_year = min(year)
-gen plot_year = s_y + min_year - s_y[1] // (so that we have the years in the x-axis)
+gen plot_year = s_y_relabel + min_year - s_y_relabel[1] // (so that we have the years in the x-axis)
 
 egen coho_min = min(byear)
 egen coho_max = max(byear)
