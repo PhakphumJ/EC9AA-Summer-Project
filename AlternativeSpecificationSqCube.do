@@ -13,7 +13,7 @@ clear
 cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
 use "Data/CPS_Cleaned.dta"
 
-keep if year >= 1961 & year <= 2023
+drop if year == 1962 // since no eduyrs.
 keep if ybirth >= 1910 & ybirth <= 1994 // 17 cohorts.
 
 * We are not creating experience bins this time.
@@ -50,25 +50,14 @@ foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from
 	replace coh_rlb = `num' if d_c`num' == 1
 }
 
-** Create Deaton's time vriables.
-* gen time dummy (This is only used for relabelling later on and create Deaton's time dummy)
-tab year, g(d_t) // dummies for each year
-local n_year = r(r)	
+drop d_c* // to reduce memory usage.
 
-// relabel year to be from 1 to n_year instead of the actual year.
-gen year_rlb = .
-foreach num of numlist 1(1)`n_year'{
-	replace year_rlb = `num' if d_t`num' == 1
-}
-
-* gen Deaton's time variables.
-foreach num of numlist 3(1) `n_year' {
-	// dt* = dt-(t-1)*d2+(t-2)*d1		[see Deaton(1997, p126) equation (2.95)]
-	gen d_t`num'star=d_t`num'-(`num'-1)*d_t2+(`num'-2)*d_t1
-}
+// gen time variable
+gen year_rlb = year - 1960
 
 * Drop those with missing values
 drop if eduyrs == . | logrealwage == . | ybirth == .
+
 
 * Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
 rename asecwt perwt
@@ -77,7 +66,7 @@ replace perwt = perwt/tot_pers
 bys year: egen av_perwt = mean(perwt)
 
 /// Decomposing ///
-
+reg logrealwage exp_sq exp_cube i.coh_rlb i.year_rlb [pweight=perwt]
 
 
 
