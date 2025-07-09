@@ -139,8 +139,8 @@ use "Data/US_Census_Cleaned.dta"
 drop sex incwage realwage CPI income_bottom2_5pct income_top2_5pct outlier // not useful anymore.
 
 rename birthyr ybirth
-keep if year >= 1959 & year <= 2022
-keep if ybirth >= 1910 & ybirth <= 1994
+keep if year >= 1969 & year <= 2022
+keep if ybirth >= 1920 & ybirth <= 1994
 
 * We are not creating experience bins this time.
 keep if exp_baseline >= 0 & exp_baseline <= 39
@@ -182,7 +182,7 @@ foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from
 drop d_c* // to reduce memory usage.
 
 // gen time variable
-gen year_rlb = year - 1958
+gen year_rlb = year - 1968
 
 * Drop those with missing values
 drop if eduyrs == . | logrealwage == . | ybirth == .
@@ -196,3 +196,61 @@ bys year: egen av_perwt = mean(perwt)
 /// Decomposing ///
 reg logrealwage exp_sq exp_cube i.coh_rlb i.year_rlb [pweight=perwt]
 mat coef_mat=e(b)
+
+/// Storing the results ///
+** These are the axes for plotting. 
+
+gen plot_wexp = .
+foreach num of numlist 0(1)`n_exp'{
+	replace plot_wexp  = `num' if _n == `num' + 1
+} // it generates 0,1,2,...39
+
+
+egen coho_min = min(byear)
+gen plot_coh  = coho_min
+display `n_cohort'
+foreach num of numlist 2(1)`n_cohort'{
+	replace plot_coh  = plot_coh + (`num' - 1)*5 if _n == `num'
+} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+
+// The years are 1969, 1979, 1989, 1999, 2000 - 2022 
+tab year
+local n_year = r(r) // number of years.
+egen year_min = min(year)
+gen plot_year = year_min
+foreach num of numlist 2(1)4{
+	replace plot_year = year_min + (`num'-1)*10 if _n == `num'
+}
+foreach num of numlist 5(1)`n_year'{
+	replace plot_year = plot_year[4] + (`num' - 4) if _n == `num'
+}
+
+** Storing the effects
+gen profile_wexp = .
+gen profile_coh = .
+gen profile_year = .
+
+// experience
+gen exp_sq_eff = coef_mat[1,1]
+gen exp_cb_eff = coef_mat[1,2]
+replace profile_wexp = exp_sq_eff*(plot_wexp - exp_bar)^2 + exp_cb_eff*(plot_wexp - exp_bar)^3
+replace profile_wexp = exp(profile_wexp) // converting to levels
+
+// cohort
+replace profile_coh = 0 if _n == 1 // since it is the base group.
+foreach num of numlist 2(1)`n_cohort' { // have to start from 2 since the first is the coeff of base group, which is = 0.
+	replace profile_coh = coef_mat[1,`num' + 2] if _n==`num' // since the coeff of cohort come after the coeff of exp and the first cohort group (base).
+}
+replace profile_coh = exp(profile_coh) // converting to levels
+
+// time
+foreach num of numlist 1(1)`n_year'{
+	replace profile_year = coef_mat[1,`n_cohort' + `num' + 2] if _n==`num'
+}
+replace profile_year = exp(profile_year) // converting to levels
+
+
+keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not containing the data for plotting. 
+keep profile_* plot_* // keeping only relevant columns for plotting.
+
+save "Data/Temp/AltSpec_sample2.dta", replace
