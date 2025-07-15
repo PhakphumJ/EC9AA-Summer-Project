@@ -177,8 +177,20 @@ save "Data/Temp/HLT_results_all_sample_time_profile.dta", replace
 
 *** Plotting. ***
 ** Experience **
+clear
+use "Data/Temp/HLT_results_all_sample_exp_profile.dta"
 
 
+twoway (scatter profile_wexp_sam1_basel_UnCr plot_wexp, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue))		/// 
+(scatter profile_wexp_sam1_basel_Cr plot_wexp, msymbol(th) mcolor(blue) msize(small) connect(l) lcolor(blue) lpattern(dash)) ///  
+(scatter profile_wexp_sam2_basel_UnCr plot_wexp, msymbol(dh) mcolor(emerald) msize(small) connect(l) lcolor(emerald))		/// 
+(scatter profile_wexp_sam2_basel_Cr plot_wexp, msymbol(th) mcolor(emerald) msize(small) connect(l) lcolor(emerald) lpattern(dash)) /// 
+(scatter profile_wexp_sam3_basel_UnCr plot_wexp, msymbol(dh) mcolor(red) msize(small) connect(l) lcolor(red))		/// 
+(scatter profile_wexp_sam3_basel_Cr plot_wexp, msymbol(th) mcolor(red) msize(small) connect(l) lcolor(red) lpattern(dash)), ///
+xlabel(0(5)40,labsize(medium)) ylabel(1(1)4,labsize(medium)) 		/// 
+xtitle("wexp",size(medsmall)) ytitle("")	///
+legend(order(1 "Sample 1 Uncorrected age" 2 "Sample 1 Corrected age" 3 "Sample 2 Uncorrected age" 4 "Sample 2 Corrected age" 5 "Sample 3 Uncorrected age" 6 "Sample 3 Corrected age") rows(3) pos(6) size(medsmall))	///
+title("Experience Effects (1969 = 1)",size(medlarge) color(black)) name(expeff_baseline, replace) xsize(14) ysize(10)
 
 ** Cohort **
 
@@ -186,6 +198,7 @@ save "Data/Temp/HLT_results_all_sample_time_profile.dta", replace
 
 ** Time ** 
 * Normalizing.  Set 1969 to 1. It's the 8th row.
+clear
 use "Data/Temp/HLT_results_all_sample_time_profile.dta"
 
 gen F_per_time_sample1_UnCr = profile_year_sam1_basel_UnCr[8]
@@ -203,12 +216,12 @@ replace profile_year_sam3_basel_UnCr = profile_year_sam3_basel_UnCr/F_per_time_s
 replace profile_year_sam3_basel_Cr = profile_year_sam3_basel_Cr/F_per_time_sample3_Cr
 
 
-twoway (scatter profile_year_sam1_basel_UnCr plot_year, msymbol(th) mcolor(blue) msize(small) connect(l) lcolor(blue))		/// 
-(scatter profile_year_sam1_basel_Cr plot_year, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue) lpattern(dash)) ///  
-(scatter profile_year_sam2_basel_UnCr plot_year, msymbol(th) mcolor(emerald) msize(small) connect(l) lcolor(emerald))		/// 
-(scatter profile_year_sam2_basel_Cr plot_year, msymbol(dh) mcolor(emerald) msize(small) connect(l) lcolor(emerald) lpattern(dash)) /// 
-(scatter profile_year_sam3_basel_UnCr plot_year, msymbol(th) mcolor(red) msize(small) connect(l) lcolor(red))		/// 
-(scatter profile_year_sam3_basel_Cr plot_year, msymbol(dh) mcolor(red) msize(small) connect(l) lcolor(red) lpattern(dash)), ///
+twoway (scatter profile_year_sam1_basel_UnCr plot_year, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue))		/// 
+(scatter profile_year_sam1_basel_Cr plot_year, msymbol(th) mcolor(blue) msize(small) connect(l) lcolor(blue) lpattern(dash)) ///  
+(scatter profile_year_sam2_basel_UnCr plot_year, msymbol(dh) mcolor(emerald) msize(small) connect(l) lcolor(emerald))		/// 
+(scatter profile_year_sam2_basel_Cr plot_year, msymbol(th) mcolor(emerald) msize(small) connect(l) lcolor(emerald) lpattern(dash)) /// 
+(scatter profile_year_sam3_basel_UnCr plot_year, msymbol(dh) mcolor(red) msize(small) connect(l) lcolor(red))		/// 
+(scatter profile_year_sam3_basel_Cr plot_year, msymbol(th) mcolor(red) msize(small) connect(l) lcolor(red) lpattern(dash)), ///
 xlabel(1965(5)2020,labsize(medsmall)) ylabel(1(0.5)2,labsize(medsmall)) 		/// 
 xtitle("Year",size(medsmall)) ytitle("")	///
 legend(order(1 "Sample 1 Uncorrected age" 2 "Sample 1 Corrected age" 3 "Sample 2 Uncorrected age" 4 "Sample 2 Corrected age" 5 "Sample 3 Uncorrected age" 6 "Sample 3 Corrected age") rows(3) pos(6) size(medsmall))	///
