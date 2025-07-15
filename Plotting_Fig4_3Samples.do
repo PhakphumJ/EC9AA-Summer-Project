@@ -180,7 +180,7 @@ save "Data/Temp/HLT_results_all_sample_time_profile.dta", replace
 clear
 use "Data/Temp/HLT_results_all_sample_exp_profile.dta"
 
-
+replace plot_wexp = plot_wexp + 2.5 // This is the shift the point to the middle of the bins.
 twoway (scatter profile_wexp_sam1_basel_UnCr plot_wexp, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue))		/// 
 (scatter profile_wexp_sam1_basel_Cr plot_wexp, msymbol(th) mcolor(blue) msize(small) connect(l) lcolor(blue) lpattern(dash)) ///  
 (scatter profile_wexp_sam2_basel_UnCr plot_wexp, msymbol(dh) mcolor(emerald) msize(small) connect(l) lcolor(emerald))		/// 
@@ -188,12 +188,31 @@ twoway (scatter profile_wexp_sam1_basel_UnCr plot_wexp, msymbol(dh) mcolor(blue)
 (scatter profile_wexp_sam3_basel_UnCr plot_wexp, msymbol(dh) mcolor(red) msize(small) connect(l) lcolor(red))		/// 
 (scatter profile_wexp_sam3_basel_Cr plot_wexp, msymbol(th) mcolor(red) msize(small) connect(l) lcolor(red) lpattern(dash)), ///
 xlabel(0(5)40,labsize(medium)) ylabel(1(1)4,labsize(medium)) 		/// 
-xtitle("wexp",size(medsmall)) ytitle("")	///
+xtitle("Potential Experience",size(medsmall)) ytitle("")	///
 legend(order(1 "Sample 1 Uncorrected age" 2 "Sample 1 Corrected age" 3 "Sample 2 Uncorrected age" 4 "Sample 2 Corrected age" 5 "Sample 3 Uncorrected age" 6 "Sample 3 Corrected age") rows(3) pos(6) size(medsmall))	///
-title("Experience Effects (1969 = 1)",size(medlarge) color(black)) name(expeff_baseline, replace) xsize(14) ysize(10)
+title("Experience Effects",size(medlarge) color(black)) name(expeff_baseline, replace) xsize(14) ysize(10)
 
 ** Cohort **
+clear
+use "Data/Temp/HLT_results_all_sample_cohort_profile.dta"
+// normalize 1920 to 1. It's the third row.
+gen coh_1920_sample1_UnCr = profile_coh_sam1_basel_UnCr[3]
+gen coh_1920_sample1_Cr = profile_coh_sam1_basel_Cr[3]
 
+replace profile_coh_sam1_basel_UnCr = profile_coh_sam1_basel_UnCr/coh_1920_sample1_UnCr
+replace profile_coh_sam1_basel_Cr = profile_coh_sam1_basel_Cr/coh_1920_sample1_Cr
+
+replace plot_coh = plot_coh + 2.5 // This is the shift the point to the middle of the bins.
+twoway (scatter profile_coh_sam1_basel_UnCr plot_coh, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue))		/// 
+(scatter profile_coh_sam1_basel_Cr plot_coh, msymbol(th) mcolor(blue) msize(small) connect(l) lcolor(blue) lpattern(dash)) ///  
+(scatter profile_coh_sam2_basel_UnCr plot_coh, msymbol(dh) mcolor(emerald) msize(small) connect(l) lcolor(emerald))		/// 
+(scatter profile_coh_sam2_basel_Cr plot_coh, msymbol(th) mcolor(emerald) msize(small) connect(l) lcolor(emerald) lpattern(dash)) /// 
+(scatter profile_coh_sam3_basel_UnCr plot_coh, msymbol(dh) mcolor(red) msize(small) connect(l) lcolor(red))		/// 
+(scatter profile_coh_sam3_basel_Cr plot_coh, msymbol(th) mcolor(red) msize(small) connect(l) lcolor(red) lpattern(dash)), ///
+xlabel(1910(10)1990,labsize(medsmall)) ylabel(1(0.5)2,labsize(medsmall)) 		/// 
+xtitle("Birth Year",size(medsmall)) ytitle("")	///
+legend(order(1 "Sample 1 Uncorrected age" 2 "Sample 1 Corrected age" 3 "Sample 2 Uncorrected age" 4 "Sample 2 Corrected age" 5 "Sample 3 Uncorrected age" 6 "Sample 3 Corrected age") rows(3) pos(6) size(medsmall))	///
+title("Cohort Effects (1920 = 1)",size(medlarge) color(black)) name(coheff_baseline, replace) xsize(14) ysize(10)
 
 
 ** Time ** 
@@ -227,6 +246,15 @@ xtitle("Year",size(medsmall)) ytitle("")	///
 legend(order(1 "Sample 1 Uncorrected age" 2 "Sample 1 Corrected age" 3 "Sample 2 Uncorrected age" 4 "Sample 2 Corrected age" 5 "Sample 3 Uncorrected age" 6 "Sample 3 Corrected age") rows(3) pos(6) size(medsmall))	///
 title("Time Effects (1969 = 1)",size(medlarge) color(black)) name(yeareff_baseline, replace) xsize(14) ysize(10)
 
+
+** Combine and export 
+graph export "Figs/exp_3Samples_Baseline.jpg", name(expeff_baseline) replace
+graph export "Figs/coh_3Samples_Baseline.jpg", name(coheff_baseline) replace
+graph export "Figs/year_3Samples_Baseline.jpg", name(yeareff_baseline) replace
+
+
+graph combine expeff_baseline coheff_baseline yeareff_baseline, xsize(12) ysize(22) row(3) 
+graph export "Figs/Fig4_3Samples_Baseline.jpg", replace
 
 /// Alternative Specification ///
 
