@@ -442,7 +442,6 @@ save "Data/Temp/AltSpec_results_all_sample_time_profile.dta", replace
 clear
 use "Data/Temp/AltSpec_results_all_sample_exp_profile.dta"
 
-replace plot_wexp = plot_wexp + 2.5 // This is the shift the point to the middle of the bins.
 twoway (scatter profile_wexp_sam1_altsp_UnCr plot_wexp, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue))		/// 
 (scatter profile_wexp_sam1_altsp_Cr plot_wexp, msymbol(th) mcolor(blue) msize(small) connect(l) lcolor(blue) lpattern(dash)) ///  
 (scatter profile_wexp_sam2_altsp_UnCr plot_wexp, msymbol(dh) mcolor(emerald) msize(small) connect(l) lcolor(emerald))		/// 
