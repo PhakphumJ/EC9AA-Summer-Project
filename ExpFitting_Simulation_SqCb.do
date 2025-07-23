@@ -1,3 +1,6 @@
+clear
+cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
+
 clear      
 set obs 40  
 gen exp = _n - 1 // (0-39)
