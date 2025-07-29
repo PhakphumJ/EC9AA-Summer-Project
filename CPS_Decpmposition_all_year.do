@@ -2,8 +2,8 @@
 ** But, now use the whole available periods of CPS data (1961 - 2023).
 
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/CPS_Cleaned_UnCr.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\CPS_Cleaned_UnCr.dta"
 
 keep if ybirth >= 1910 & ybirth <= 1994 // 17 cohorts. 
 drop if year == 1962 // since 'educ' is not available.
@@ -282,7 +282,7 @@ keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not
 keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
 drop profile*plot
 
-save "Data/Temp/HLT_results_sample1_UnCr.dta", replace
+save "Data\Temp\HLT_results_sample1_UnCr.dta", replace
 
 
 
@@ -291,8 +291,8 @@ save "Data/Temp/HLT_results_sample1_UnCr.dta", replace
 
 
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/CPS_Cleaned_Cr.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\CPS_Cleaned_Cr.dta"
 
 keep if ybirth >= 1910 & ybirth <= 1994 // 17 cohorts. 
 drop if year == 1962 // since 'educ' is not available.
@@ -571,4 +571,4 @@ keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not
 keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
 drop profile*plot
 
-save "Data/Temp/HLT_results_sample1_Cr.dta", replace
+save "Data\Temp\HLT_results_sample1_Cr.dta", replace

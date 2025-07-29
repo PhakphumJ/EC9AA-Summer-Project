@@ -1,5 +1,5 @@
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
 
 clear      
 set obs 40  
@@ -32,4 +32,4 @@ legend(order(1 "True Values (level)" 2 "Fitted Values (level)" 3 "True Values (l
 title("Experience Effects",size(medlarge) color(black)) name(expeff_sim, replace) xsize(14) ysize(10)
 
 ** Save the results
-graph export "Figs/exp_sim_fit.jpg", name(expeff_sim) replace
+graph export "Figs\exp_sim_fit.jpg", name(expeff_sim) replace

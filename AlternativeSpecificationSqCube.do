@@ -10,8 +10,8 @@
 *****************************************
 /// Preparing the sample ///
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/CPS_Cleaned_UnCr.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\CPS_Cleaned_UnCr.dta"
 
 drop if year == 1962 // since no eduyrs.
 keep if ybirth >= 1910 & ybirth <= 1994 // 17 cohorts.
@@ -126,15 +126,15 @@ replace profile_year = exp(profile_year) // converting to levels
 keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not containing the data for plotting. 
 keep profile_* plot_* // keeping only relevant columns for plotting.
 
-save "Data/Temp/AltSpec_sample1_UnCr.dta", replace
+save "Data\Temp\AltSpec_sample1_UnCr.dta", replace
 
 *****************************************
 * Next, let's do US Census **
 *****************************************
 /// Preparing the sample ///
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/US_Census_Cleaned_UnCr.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\US_Census_Cleaned_UnCr.dta"
 
 drop sex incwage realwage CPI income_bottom2_5pct income_top2_5pct outlier // not useful anymore.
 
@@ -252,7 +252,7 @@ replace profile_year = exp(profile_year) // converting to levels
 keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not containing the data for plotting. 
 keep profile_* plot_* // keeping only relevant columns for plotting.
 
-save "Data/Temp/AltSpec_sample2_UnCr.dta", replace
+save "Data\Temp\AltSpec_sample2_UnCr.dta", replace
 
 
 *****************************************
@@ -261,8 +261,8 @@ save "Data/Temp/AltSpec_sample2_UnCr.dta", replace
 
 /// Preparing the sample ///
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/CPS_Cleaned_UnCr.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\CPS_Cleaned_UnCr.dta"
 
 drop sex incwage realwage CPI income_bottom2_5pct income_top2_5pct outlier // not useful anymore.
 
@@ -382,7 +382,7 @@ replace profile_year = exp(profile_year) // converting to levels
 keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not containing the data for plotting. 
 keep profile_* plot_* // keeping only relevant columns for plotting.
 
-save "Data/Temp/AltSpec_sample3_UnCr.dta", replace
+save "Data\Temp\AltSpec_sample3_UnCr.dta", replace
 
 
 //////////////////////////////////////////////////////////////
@@ -392,8 +392,8 @@ save "Data/Temp/AltSpec_sample3_UnCr.dta", replace
 *****************************************
 /// Preparing the sample ///
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/CPS_Cleaned_Cr.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\CPS_Cleaned_Cr.dta"
 
 drop if year == 1962 // since no eduyrs.
 keep if ybirth >= 1910 & ybirth <= 1994 // 17 cohorts.
@@ -508,15 +508,15 @@ replace profile_year = exp(profile_year) // converting to levels
 keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not containing the data for plotting. 
 keep profile_* plot_* // keeping only relevant columns for plotting.
 
-save "Data/Temp/AltSpec_sample1_Cr.dta", replace
+save "Data\Temp\AltSpec_sample1_Cr.dta", replace
 
 *****************************************
 * Next, let's do US Census **
 *****************************************
 /// Preparing the sample ///
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/US_Census_Cleaned_Cr.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\US_Census_Cleaned_Cr.dta"
 
 drop sex incwage realwage CPI income_bottom2_5pct income_top2_5pct outlier // not useful anymore.
 
@@ -634,7 +634,7 @@ replace profile_year = exp(profile_year) // converting to levels
 keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not containing the data for plotting. 
 keep profile_* plot_* // keeping only relevant columns for plotting.
 
-save "Data/Temp/AltSpec_sample2_Cr.dta", replace
+save "Data\Temp\AltSpec_sample2_Cr.dta", replace
 
 
 *****************************************
@@ -643,8 +643,8 @@ save "Data/Temp/AltSpec_sample2_Cr.dta", replace
 
 /// Preparing the sample ///
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/CPS_Cleaned_Cr.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\CPS_Cleaned_Cr.dta"
 
 drop sex incwage realwage CPI income_bottom2_5pct income_top2_5pct outlier // not useful anymore.
 
@@ -764,4 +764,4 @@ replace profile_year = exp(profile_year) // converting to levels
 keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not containing the data for plotting. 
 keep profile_* plot_* // keeping only relevant columns for plotting.
 
-save "Data/Temp/AltSpec_sample3_Cr.dta", replace
+save "Data\Temp\AltSpec_sample3_Cr.dta", replace

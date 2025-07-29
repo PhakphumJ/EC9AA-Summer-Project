@@ -1,8 +1,8 @@
 *** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4) ***
 ** Using Census Data **
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/US_Census_Cleaned_UnCr.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\US_Census_Cleaned_UnCr.dta"
 
 drop sex incwage realwage CPI income_bottom2_5pct income_top2_5pct outlier // not useful anymore.
 
@@ -261,15 +261,15 @@ keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not
 keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
 drop profile*plot
 
-save "Data/Temp/HLT_results_sample2_UnCr.dta", replace
+save "Data\Temp\HLT_results_sample2_UnCr.dta", replace
 
 
 ////////////////////////////////////////////
 ///// The Below is for doing the same thing but using the dataset with corrected age variable. ///
 
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/US_Census_Cleaned_Cr.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\US_Census_Cleaned_Cr.dta"
 
 drop sex incwage realwage CPI income_bottom2_5pct income_top2_5pct outlier // not useful anymore.
 
@@ -527,4 +527,4 @@ keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not
 keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
 drop profile*plot
 
-save "Data/Temp/HLT_results_sample2_Cr.dta", replace
+save "Data\Temp\HLT_results_sample2_Cr.dta", replace

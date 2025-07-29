@@ -5,7 +5,7 @@
 
 *** Preparing the data
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project/Data"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data"
 use usa_census_smallest.dta
 
 
@@ -98,7 +98,7 @@ save "US_Census_Cleaned_UnCr.dta", replace
 ///// The code below is for creating the dataset with corrected age variable (age = age - 1). ///
 *** Preparing the data
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project/Data"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data"
 use usa_census_smallest.dta
 
 

@@ -5,7 +5,7 @@
 
 *** Preparing the data
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project/Data"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data"
 use cps_00004.dta
 
 * drop irrelevant variables (for all analysis)

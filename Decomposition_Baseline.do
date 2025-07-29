@@ -1,8 +1,8 @@
 *** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4) ***
 
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/CPS_Cleaned_UnCr.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\CPS_Cleaned_UnCr.dta"
 
 *** Let's try to do figure 4 exactly first. Hence, use data from 1986 - 2012. And restrict sample to those born from 1935 - 1984
 
@@ -270,7 +270,7 @@ keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not
 keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
 drop profile*plot
 
-save "Data/Temp/HLT_results_CPS_1986_2012_UnCr.dta", replace
+save "Data\Temp\HLT_results_CPS_1986_2012_UnCr.dta", replace
 
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -278,8 +278,8 @@ save "Data/Temp/HLT_results_CPS_1986_2012_UnCr.dta", replace
 *** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4) ***
 
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/CPS_Cleaned_Cr.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\CPS_Cleaned_Cr.dta"
 
 *** Let's try to do figure 4 exactly first. Hence, use data from 1986 - 2012. And restrict sample to those born from 1935 - 1984
 
@@ -547,4 +547,4 @@ keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not
 keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
 drop profile*plot
 
-save "Data/Temp/HLT_results_CPS_1986_2012_Cr.dta", replace
+save "Data\Temp\HLT_results_CPS_1986_2012_Cr.dta", replace

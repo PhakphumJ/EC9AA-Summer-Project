@@ -1,8 +1,8 @@
 *** Next, let's to do with their algorithm exactly. *** 
 
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/CPS_Cleaned.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\CPS_Cleaned.dta"
 
 *** Let's try to do figure 4 exactly first. Hence, use data from 1986 - 2012. And restrict sample to those born from 1935 - 1984
 
@@ -310,4 +310,4 @@ else{
 	display("Insufficient Number of Observation")
 }
 
-save "Data/Temp/HLT_results_CPS_1986_2012_identical_algo.dta", replace
+save "Data\Temp\HLT_results_CPS_1986_2012_identical_algo.dta", replace

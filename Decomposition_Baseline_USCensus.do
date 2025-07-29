@@ -1,8 +1,8 @@
 *** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4) ***
 ** Using Census Data **
 clear
-cd "/home/phakphum/WarwickPhD/EC9AA Summer Project"
-use "Data/US_Census_Cleaned.dta"
+cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
+use "Data\US_Census_Cleaned.dta"
 
 drop sex incwage realwage CPI income_bottom2_5pct income_top2_5pct outlier // not useful anymore.
 
@@ -261,4 +261,4 @@ keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not
 keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
 drop profile*plot
 
-save "Data/Temp/HLT_results_USCensus.dta", replace
+save "Data\Temp\HLT_results_USCensus.dta", replace
