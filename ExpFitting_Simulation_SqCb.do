@@ -8,14 +8,16 @@ gen true_fn = 1+ log(1+exp) // assume this is the true experience profile.
 gen log_true_fn = log(true_fn)
 
 *** Now we will fit beta_1(exp - exp_bar)^2 + beta_2(exp - exp_bar)^3 to the the true function.
-gen exp_bar = 35 // zero effects at exp_bar 
+gen exp_bar = 0 // zero effects at exp_bar 
+gen exp_lin = exp - exp_bar
 gen exp_sq = (exp - exp_bar)^2
 gen exp_cube = (exp - exp_bar)^3
 
-reg log_true_fn exp_sq exp_cube
+reg log_true_fn exp_lin exp_sq exp_cube
 mat coef_mat=e(b)
-gen exp_sq_eff = coef_mat[1,1]
-gen exp_cb_eff = coef_mat[1,2]
+gen exp_lin_eff = coef_mat[1,1]
+gen exp_sq_eff = coef_mat[1,2]
+gen exp_cb_eff = coef_mat[1,3]
 predict y_hat
 gen level_fitted = exp(y_hat)
 
