@@ -89,7 +89,7 @@ global medreg 0			// whether perform median regression or not
 global ctrledu 0		// whether control education or not
 global min_obs 0		// set minumum number of observations in each year/experience bin. (Suggested 10 or >)
 global max_iter 50 		// maximum number of iteration (to stop if algorithm does not convergence)
-global precision 0.0001 // percentage gap between growth rates at convergence. 
+global precision 0.01 // percentage gap between growth rates at convergence. 
 global dump 0.7 		// dumping factor useful to achieve convergence. Should be not too small relative to precision, or you get fake convergence. 
 global delta 0 			// depreciation rate for HLT
 global bin_coh 5		// length of cohort bins
@@ -132,7 +132,16 @@ local n_wexp_per_year = `n_group' / `n_year'
 ** Initilize
 gen cons_term = .
 local iter = 1
-local diff = 1 // (we want to minimize this.)
+local g_30 = 1 // (we want these to be close to 0.)
+local g_31 = 1 
+local g_32 = 1 
+local g_33 = 1 
+local g_34 = 1 
+local g_35 = 1 
+local g_36 = 1 
+local g_37 = 1 
+local g_38 = 1
+local g_39 = 1 
 
 // preallocate some variables, which are used for convergence
 gen growth_wexp = . //(growth of exp effect in the last working years)
@@ -160,7 +169,7 @@ display "Intial growth of the linear time trend (g_0): `g_0'"
 gen growth_m_plusone = .
 
 ** Algorithm Loop
-while `diff' > $precision & `iter' < $max_iter{
+while (`g_30' > $precision | `g_31' > $precision | `g_32' > $precision | `g_33' > $precision | `g_34' > $precision | `g_35' > $precision | `g_36' > $precision | `g_37' > $precision | `g_38' > $precision | `g_39' > $precision)  & `iter' < $max_iter{
 	// reset the profile
 	replace profile_wexp = .
 	replace profile_coh = .
@@ -234,7 +243,7 @@ while `diff' > $precision & `iter' < $max_iter{
 	replace profile_year = (psi - fi)/(s_y[1]) if _n == 2
 	
 	* Next, check wheter we manage to make flat spot assumption holds.
-	* Extract the experience effect in the Last Ten Years (for baseline assumption, exp effect in the 6th, 7th, and 8th bins should be the same) (*** I don't like how they did this. Since, they are using only the begining and the end of the flat parts. -> Produce a hump in the middle.)
+	* I want the growth of each year in the last ten year to be close to 0.
 	summarize profile_wexp if profile_wexp_plot == $flat_end, meanonly
 	local wexp_high_scal = r(mean)
 	
@@ -250,15 +259,25 @@ while `diff' > $precision & `iter' < $max_iter{
 
 	* Update the growth of time effect g^{m+1} = g^m + \delta * r^m_{end}
 	replace growth_m_plusone = growth_m + $dump*growth_wexp
-	local diff = abs(growth_m_plusone - growth_m)/abs(growth_m)
-
-	display "The difference is: `diff'"
 	
-	if `diff' > $precision{ 
-		drop *temp* s_y psi fi
+	gen growth_wexp_eff = abs(profile_wexp - profile_wexp[_n-1]) if profile_wexp_plot == profile_wexp_plot[_n-1] + 1 // This create the growth variable (first diff in log)
+	
+	* Get max wexp index
+	quietly summarize profile_wexp_plot
+	local maxwexp = r(max)
+
+	* Extract last 10 values into locals
+	forvalues y_wexp = `=`maxwexp'-9' / `maxwexp' {
+		quietly summarize growth_wexp_eff if profile_wexp_plot == `y_wexp'
+		local g_`y_wexp' = r(mean)
+		display "`y_wexp' : `g_`y_wexp''"
 	}
 	
+	if `g_30' > $precision | `g_31' > $precision | `g_32' > $precision | `g_33' > $precision | `g_34' > $precision | `g_35' > $precision | `g_36' > $precision | `g_37' > $precision | `g_38' > $precision | `g_39' > $precision{
+		drop *temp* s_y psi fi growth_wexp_eff
+	}
 	local iter = `iter' + 1
+	display "iteration = `iter'"
 }
 
 gen iter = `iter' - 1
@@ -301,7 +320,7 @@ keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not
 keep profile_* plot_* growth_m iter cons_term // keeping only relevant columns for plotting.
 drop profile*plot
 
-save "Data\Temp\HLT_results_sample1_UnCr_AltSpec.dta", replace
+save "Data\Temp\HLT_results_sample1_UnCr_AltSpec_Strict.dta", replace
 
 
 
