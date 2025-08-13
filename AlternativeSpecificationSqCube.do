@@ -22,6 +22,7 @@ keep if exp_baseline >= 0 & exp_baseline <= 39
 gen exp_bar = 35 // zero effects at exp_bar 
 gen exp_sq = (exp_baseline - exp_bar)^2
 gen exp_cube = (exp_baseline - exp_bar)^3
+gen exp_quar = (exp_baseline - exp_bar)^4
 
 tab exp_baseline
 local n_exp = r(r) // store number of exp. 
@@ -69,7 +70,7 @@ replace perwt = perwt/tot_pers
 bys year: egen av_perwt = mean(perwt)
 
 /// Decomposing ///
-reg logrealwage exp_sq exp_cube i.coh_rlb i.year_rlb [pweight=perwt]
+reg logrealwage exp_sq exp_cube exp_quar i.coh_rlb i.year_rlb [pweight=perwt]
 mat coef_mat=e(b)
 
 /// Storing the results ///
@@ -106,19 +107,20 @@ gen profile_year = .
 // experience
 gen exp_sq_eff = coef_mat[1,1]
 gen exp_cb_eff = coef_mat[1,2]
-replace profile_wexp = exp_sq_eff*(plot_wexp - exp_bar)^2 + exp_cb_eff*(plot_wexp - exp_bar)^3
+gen exp_quar_eff = coef_mat[1,3]
+replace profile_wexp = exp_sq_eff*(plot_wexp - exp_bar)^2 + exp_cb_eff*(plot_wexp - exp_bar)^3 + exp_quar_eff*(plot_wexp - exp_bar)^4
 replace profile_wexp = exp(profile_wexp) // converting to levels
 
 // cohort
 replace profile_coh = 0 if _n == 1 // since it is the base group.
 foreach num of numlist 2(1)`n_cohort' { // have to start from 2 since the first is the coeff of base group, which is = 0.
-	replace profile_coh = coef_mat[1,`num' + 2] if _n==`num' // since the coeff of cohort come after the coeff of exp and the first cohort group (base).
+	replace profile_coh = coef_mat[1,`num' + 3] if _n==`num' // since the coeff of cohort come after the coeff of exp and the first cohort group (base).
 }
 replace profile_coh = exp(profile_coh) // converting to levels
 
 // time
 foreach num of numlist 1(1)`n_year'{
-	replace profile_year = coef_mat[1,`n_cohort' + `num' + 2] if _n==`num'
+	replace profile_year = coef_mat[1,`n_cohort' + `num' + 3] if _n==`num'
 }
 replace profile_year = exp(profile_year) // converting to levels
 
