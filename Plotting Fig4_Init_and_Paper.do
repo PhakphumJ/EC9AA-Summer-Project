@@ -100,5 +100,5 @@ graph export "Figs\coh_fig4_three_outputs_Init.jpg", name(coh) replace
 graph export "Figs\year_fig4_three_outputs_Init.jpg", name(year) replace
 
 ** Combine and export 
-graph combine exp coh year,	xsize(20) ysize(8) row(1) 
+graph combine exp coh year,	xsize(15) ysize(32) row(3) 
 graph export "Figs\Comparison_three_outputs_combined_Init.jpg", replace

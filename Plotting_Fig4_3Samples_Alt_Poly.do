@@ -445,7 +445,7 @@ twoway (scatter profile_coh_sam1_UnCr_cubic plot_coh, msymbol(dh) mcolor(blue) m
 xlabel(1910(10)1990,labsize(medsmall)) ylabel(0(0.5)2,labsize(medsmall)) 		/// 
 xtitle("Birth Year",size(medsmall)) ytitle("")	///
 legend(order(1 "Sample 1 Uncorrected age" 2 "Sample 1 Corrected age" 3 "Sample 2 Uncorrected age" 4 "Sample 2 Corrected age" 5 "Sample 3 Uncorrected age" 6 "Sample 3 Corrected age") rows(3) pos(6) size(medsmall))	///
-title("Cohort Effects (1920 = 1)",size(medlarge) color(black)) name(coheffec_cubic, replace) xsize(14) ysize(10)
+title("Cohort Effects (Cohort bin 1920-1924 = 1)",size(medlarge) color(black)) name(coheffec_cubic, replace) xsize(14) ysize(10)
 
 *** Quartic ***
 twoway (scatter profile_coh_sam1_UnCr_quartic plot_coh, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue))		/// 
@@ -457,7 +457,7 @@ twoway (scatter profile_coh_sam1_UnCr_quartic plot_coh, msymbol(dh) mcolor(blue)
 xlabel(1910(10)1990,labsize(medsmall)) ylabel(0(0.5)4,labsize(medsmall)) 		/// 
 xtitle("Birth Year",size(medsmall)) ytitle("")	///
 legend(order(1 "Sample 1 Uncorrected age" 2 "Sample 1 Corrected age" 3 "Sample 2 Uncorrected age" 4 "Sample 2 Corrected age" 5 "Sample 3 Uncorrected age" 6 "Sample 3 Corrected age") rows(3) pos(6) size(medsmall))	///
-title("Cohort Effects (1920 = 1)",size(medlarge) color(black)) name(coheffec_quartic, replace) xsize(14) ysize(10)
+title("Cohort Effects (Cohort bin 1920-1924 = 1)",size(medlarge) color(black)) name(coheffec_quartic, replace) xsize(14) ysize(10)
 
 ** Time ** 
 * Normalizing.  Set 1969 to 1. It's the 8th row.
@@ -505,7 +505,7 @@ twoway (scatter profile_year_sam1_UnCr_cubic plot_year, msymbol(dh) mcolor(blue)
 xlabel(1965(5)2020,labsize(medsmall)) ylabel(0(1)4,labsize(medsmall)) 		/// 
 xtitle("Year",size(medsmall)) ytitle("")	///
 legend(order(1 "Sample 1 Uncorrected age" 2 "Sample 1 Corrected age" 3 "Sample 2 Uncorrected age" 4 "Sample 2 Corrected age" 5 "Sample 3 Uncorrected age" 6 "Sample 3 Corrected age") rows(3) pos(6) size(medsmall))	///
-title("Time Effects (1969 = 1)",size(medlarge) color(black)) name(yeareffec_cubic, replace) xsize(14) ysize(10)
+title("Time Effects (Year 1969 = 1)",size(medlarge) color(black)) name(yeareffec_cubic, replace) xsize(14) ysize(10)
 
 *** Quartic ***
 twoway (scatter profile_year_sam1_UnCr_quartic plot_year, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue))		/// 
@@ -517,7 +517,7 @@ twoway (scatter profile_year_sam1_UnCr_quartic plot_year, msymbol(dh) mcolor(blu
 xlabel(1965(5)2020,labsize(medsmall)) ylabel(0(1)4,labsize(medsmall)) 		/// 
 xtitle("Year",size(medsmall)) ytitle("")	///
 legend(order(1 "Sample 1 Uncorrected age" 2 "Sample 1 Corrected age" 3 "Sample 2 Uncorrected age" 4 "Sample 2 Corrected age" 5 "Sample 3 Uncorrected age" 6 "Sample 3 Corrected age") rows(3) pos(6) size(medsmall))	///
-title("Time Effects (1969 = 1)",size(medlarge) color(black)) name(yeareffec_quartic, replace) xsize(14) ysize(10)
+title("Time Effects (Year 1969 = 1)",size(medlarge) color(black)) name(yeareffec_quartic, replace) xsize(14) ysize(10)
 
 
 ** Combine and export 
@@ -527,7 +527,7 @@ graph export "Figs\coh_3Samples_cubic.jpg", name(coheffec_cubic) replace
 graph export "Figs\year_3Samples_cubic.jpg", name(yeareffec_cubic) replace
 
 
-graph combine expeffec_cubic coheffec_cubic yeareffec_cubic, xsize(12) ysize(22) row(3) title("Results from Using Cubic Polynomials")
+graph combine expeffec_cubic coheffec_cubic yeareffec_cubic, xsize(12) ysize(22) row(3) 
 graph export "Figs\Fig4_3Samples_cubic.jpg", replace
 
 * Quartic
@@ -536,5 +536,5 @@ graph export "Figs\coh_3Samples_quartic.jpg", name(coheffec_quartic) replace
 graph export "Figs\year_3Samples_quartic.jpg", name(yeareffec_quartic) replace
 
 
-graph combine expeffec_quartic coheffec_quartic yeareffec_quartic, xsize(12) ysize(22) row(3) title("Results from Using Quartic Polynomials")
+graph combine expeffec_quartic coheffec_quartic yeareffec_quartic, xsize(12) ysize(22) row(3)
 graph export "Figs\Fig4_3Samples_quartic.jpg", replace

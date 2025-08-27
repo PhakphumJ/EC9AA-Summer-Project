@@ -212,7 +212,7 @@ twoway (scatter profile_coh_sam1_basel_UnCr plot_coh, msymbol(dh) mcolor(blue) m
 xlabel(1910(10)1990,labsize(medsmall)) ylabel(1(0.5)2,labsize(medsmall)) 		/// 
 xtitle("Birth Year",size(medsmall)) ytitle("")	///
 legend(order(1 "Sample 1 Uncorrected age" 2 "Sample 1 Corrected age" 3 "Sample 2 Uncorrected age" 4 "Sample 2 Corrected age" 5 "Sample 3 Uncorrected age" 6 "Sample 3 Corrected age") rows(3) pos(6) size(medsmall))	///
-title("Cohort Effects (1920 = 1)",size(medlarge) color(black)) name(coheff_baseline, replace) xsize(14) ysize(10)
+title("Cohort Effects (Cohort bin 1920-1924 = 1)",size(medlarge) color(black)) name(coheff_baseline, replace) xsize(14) ysize(10)
 
 
 ** Time ** 
@@ -244,7 +244,7 @@ twoway (scatter profile_year_sam1_basel_UnCr plot_year, msymbol(dh) mcolor(blue)
 xlabel(1965(5)2020,labsize(medsmall)) ylabel(1(0.5)2,labsize(medsmall)) 		/// 
 xtitle("Year",size(medsmall)) ytitle("")	///
 legend(order(1 "Sample 1 Uncorrected age" 2 "Sample 1 Corrected age" 3 "Sample 2 Uncorrected age" 4 "Sample 2 Corrected age" 5 "Sample 3 Uncorrected age" 6 "Sample 3 Corrected age") rows(3) pos(6) size(medsmall))	///
-title("Time Effects (1969 = 1)",size(medlarge) color(black)) name(yeareff_baseline, replace) xsize(14) ysize(10)
+title("Time Effects (Year 1969 = 1)",size(medlarge) color(black)) name(yeareff_baseline, replace) xsize(14) ysize(10)
 
 
 ** Combine and export 
@@ -473,7 +473,7 @@ twoway (scatter profile_coh_sam1_altsp_UnCr plot_coh, msymbol(dh) mcolor(blue) m
 xlabel(1910(10)1990,labsize(medsmall)) ylabel(0(0.5)2,labsize(medsmall)) 		/// 
 xtitle("Birth Year",size(medsmall)) ytitle("")	///
 legend(order(1 "Sample 1 Uncorrected age" 2 "Sample 1 Corrected age" 3 "Sample 2 Uncorrected age" 4 "Sample 2 Corrected age" 5 "Sample 3 Uncorrected age" 6 "Sample 3 Corrected age") rows(3) pos(6) size(medsmall))	///
-title("Cohort Effects (1920 = 1)",size(medlarge) color(black)) name(coheff_altspec, replace) xsize(14) ysize(10)
+title("Cohort Effects (Cohort bin 1920-1924 = 1)",size(medlarge) color(black)) name(coheff_altspec, replace) xsize(14) ysize(10)
 
 
 ** Time ** 
@@ -505,7 +505,7 @@ twoway (scatter profile_year_sam1_altsp_UnCr plot_year, msymbol(dh) mcolor(blue)
 xlabel(1965(5)2020,labsize(medsmall)) ylabel(0(5)40,labsize(medsmall)) 		/// 
 xtitle("Year",size(medsmall)) ytitle("")	///
 legend(order(1 "Sample 1 Uncorrected age" 2 "Sample 1 Corrected age" 3 "Sample 2 Uncorrected age" 4 "Sample 2 Corrected age" 5 "Sample 3 Uncorrected age" 6 "Sample 3 Corrected age") rows(3) pos(6) size(medsmall))	///
-title("Time Effects (1969 = 1)",size(medlarge) color(black)) name(yeareff_altspec, replace) xsize(14) ysize(10)
+title("Time Effects (Year 1969 = 1)",size(medlarge) color(black)) name(yeareff_altspec, replace) xsize(14) ysize(10)
 
 
 ** Combine and export 
