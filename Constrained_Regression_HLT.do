@@ -1,13 +1,13 @@
-*** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4) ***
+*** This is the code for doing the baselinse HLT decomposition. But use constrained regression instead of the Deaton-Hall approach. *** 
+** This is for helping investigating the odd results of the alternative specification **.
 
 clear
 cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
 use "Data\CPS_Cleaned_UnCr.dta"
 
-*** Let's try to do figure 4 exactly first. Hence, use data from 1986 - 2012. And restrict sample to those born from 1935 - 1984
-
-keep if year >= 1986 & year <= 2012
-keep if ybirth >= 1935 & ybirth <= 1984
+*** Do it using Sample 1 with Uncorrected Age ***
+keep if ybirth >= 1910 & ybirth <= 1994 // 17 cohorts. 
+drop if year == 1962 // since 'educ' is not available.
 
 * gen exp bins
 egen wexp_group = cut(exp_baseline), at(0(5)40) // working life = 40 yrs old. Incrementing from 0 by 5 each step.
@@ -46,8 +46,7 @@ foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from
 }
 drop d_c* // to reduce memory usage.
 
-** Create Deaton's time vriables.
-* gen time dummy (This is only used for relabelling later on and create Deaton's time dummy)
+* gen time dummy (This is only used for relabelling the years)
 tab year, g(d_t) // dummies for each year
 local n_year = r(r)	
 
@@ -62,7 +61,7 @@ drop d_t* // to reduce memory usage.
 * Drop those with missing values
 drop if wexp_group == . | eduyrs == . | logrealwage == . | ybirth == .
 
-* Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
+* Normalizing the weights in each year -> mass of 1 in each year. 
 rename asecwt perwt
 bys year: egen tot_pers =sum(perwt)
 replace perwt = perwt/tot_pers			
@@ -72,5 +71,59 @@ bys year: egen av_perwt = mean(perwt)
 constraint 1 d_exp6 = d_exp7
 constraint 2 d_exp7 = d_exp8
 cnsreg logrealwage d_exp2 d_exp3 d_exp4 d_exp5 d_exp6 d_exp7 d_exp8 i.coh_rlb i.year_rlb [pweight=perwt], constraint(1,2)
+mat coef_mat=e(b) // store the estimated coeff in a matrix.
 
-esttab using "HLT_constrained_reg_output.tex", replace tex
+/// Storing the results ///
+** These are the axes for plotting. 
+
+gen plot_wexp = (_n-1)*5 // i.e. 0,5,10,15,...
+replace plot_wexp = . if plot_wexp > 35 // keeping only 0-35
+
+egen coho_min = min(byear)
+gen plot_coh  = coho_min
+display `n_cohort'
+foreach num of numlist 2(1)`n_cohort'{
+	replace plot_coh  = plot_coh + (`num' - 1)*5 if _n == `num'
+} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+
+
+tab year
+local n_year = r(r) // number of years.
+egen year_min = min(year)
+gen plot_year = year_min
+replace plot_year = year_min + 2 if _n == 2 //1963
+foreach num of numlist 3(1)`n_year'{
+	replace plot_year = plot_year + `num' if _n == `num'
+}
+
+** Storing the effects
+gen profile_wexp = .
+gen profile_coh = .
+gen profile_year = .
+
+// experience
+replace profile_wexp = 0 if _n == 1 // (since it is the base group) (_n is the row number)
+foreach num of numlist 2(1)`n_wexp' { 
+	replace profile_wexp = coef_mat[1,`num' - 1] if _n==`num' //accesing the first row, and `num' + 1 column of the matrix. This works since we put the coefficients of exp bins to come first.
+}
+replace profile_wexp = exp(profile_wexp) // converting to levels
+
+// cohort
+replace profile_coh = 0 if _n == 1 // since it is the base group.
+foreach num of numlist 2(1)`n_cohort' {
+	replace profile_coh = coef_mat[1, `n_wexp' + `num' - 1] if _n==`num' // since the coeff of cohort come after the coeff of experience groups.
+}
+replace profile_coh = exp(profile_coh) // converting to levels
+
+// time
+replace profile_year = 0 if _n == 1 // since it is the base group.
+foreach num of numlist 2(1)`n_year'{
+	replace profile_year = coef_mat[1,`n_wexp' + `n_cohort' + `num' - 1] if _n==`num'
+}
+replace profile_year = exp(profile_year) // converting to levels
+
+
+keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not containing the data for plotting. 
+keep profile_* plot_* // keeping only relevant columns for plotting.
+
+save "Data\Temp\HLT_ConstrainedReg.dta", replace
