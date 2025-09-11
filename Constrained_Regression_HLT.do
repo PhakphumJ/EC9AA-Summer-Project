@@ -127,3 +127,43 @@ keep if profile_year !=. | profile_coh!=. | profile_wexp!=. // dropping rows not
 keep profile_* plot_* // keeping only relevant columns for plotting.
 
 save "Data\Temp\HLT_ConstrainedReg.dta", replace
+
+**** Plot the results *****
+clear 
+use "Data\Temp\HLT_ConstrainedReg.dta"
+
+
+** Experience
+replace plot_wexp = plot_wexp + 2.5 // This is the shift the point to the middle of the bins.
+
+twoway (scatter profile_wexp plot_wexp, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue)), ///
+xlabel(0(5)40,labsize(medium)) ylabel(0(1)3,labsize(medium)) 		/// 
+xtitle("Potential Experience",size(medsmall)) ytitle("")	///
+title("Experience Effects",size(medlarge) color(black)) name(expeff, replace) xsize(14) ysize(10)
+
+** Cohort 
+// normalize 1920 to 1. It's the third row.
+gen coh_1920 = profile_coh[3]
+replace profile_coh = profile_coh/coh_1920
+
+replace plot_coh = plot_coh + 2.5 // This is the shift the point to the middle of the bins.
+
+twoway (scatter profile_coh plot_coh, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue)), ///
+xlabel(1910(10)1990,labsize(medsmall)) ylabel(0(1)4,labsize(medsmall)) 		/// 
+xtitle("Birth Year",size(medsmall)) ytitle("")	///
+title("Cohort Effects (Cohort bin 1920-1924 = 1)",size(medlarge) color(black)) name(coheff, replace) xsize(14) ysize(10)
+
+** Time 
+* Normalizing.  Set 1969 to 1. It's the 8th row.
+gen F_per_time = profile_year[8]
+replace profile_year = profile_year/F_per_time
+
+
+twoway (scatter profile_year plot_year, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue)), ///
+xlabel(1965(5)2020,labsize(medsmall)) ylabel(0(2)20,labsize(medsmall)) 		/// 
+xtitle("Year",size(medsmall)) ytitle("")	///
+title("Time Effects (Year 1969 = 1)",size(medlarge) color(black)) name(yeareff, replace) xsize(14) ysize(10)
+
+** Combine and export 
+graph combine expeff coheff yeareff, xsize(12) ysize(22) row(3) 
+graph export "Figs\Fig4_HLT_ConstrainedReg.jpg", replace
