@@ -10,7 +10,7 @@ keep if ybirth >= 1910 & ybirth <= 1994 // 17 cohorts.
 drop if year == 1962 // since 'educ' is not available.
 
 * gen exp bins
-egen wexp_group = cut(exp_baseline), at(0(5)40) // working life = 40 yrs old. Incrementing from 0 by 5 each step.
+egen wexp_group = cut(exp_baseline), at(0(5)40) // working life = 40 yrs. Incrementing from 0 by 5 each step.
 
 drop if wexp_group == . // use only those in interested experience groups (no negative experience or over 40 years)
 
@@ -68,8 +68,8 @@ replace perwt = perwt/tot_pers
 bys year: egen av_perwt = mean(perwt)
 
 **************** Decomposition **************
-constraint 1 d_exp6 = d_exp7
-constraint 2 d_exp7 = d_exp8
+constraint 1 d_exp6 = d_exp7 
+constraint 2 d_exp7 = d_exp8 // restricting the coefficients of the 6th bin, 7th bin, and 8th bin to be equal.
 cnsreg logrealwage d_exp2 d_exp3 d_exp4 d_exp5 d_exp6 d_exp7 d_exp8 i.coh_rlb i.year_rlb [pweight=perwt], constraint(1,2)
 mat coef_mat=e(b) // store the estimated coeff in a matrix.
 
@@ -84,14 +84,14 @@ gen plot_coh  = coho_min
 display `n_cohort'
 foreach num of numlist 2(1)`n_cohort'{
 	replace plot_coh  = plot_coh + (`num' - 1)*5 if _n == `num'
-} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+} // so for the second cohort bin, it is min_ybrith + 1*5. For the third cohort bin, it is min_ybirth + 2*5
 
 
 tab year
 local n_year = r(r) // number of years.
 egen year_min = min(year)
 gen plot_year = year_min
-replace plot_year = year_min + 2 if _n == 2 //1963
+replace plot_year = year_min + 2 if _n == 2 //1963 must be 3.
 foreach num of numlist 3(1)`n_year'{
 	replace plot_year = plot_year + `num' if _n == `num'
 }
@@ -104,7 +104,7 @@ gen profile_year = .
 // experience
 replace profile_wexp = 0 if _n == 1 // (since it is the base group) (_n is the row number)
 foreach num of numlist 2(1)`n_wexp' { 
-	replace profile_wexp = coef_mat[1,`num' - 1] if _n==`num' //accesing the first row, and `num' + 1 column of the matrix. This works since we put the coefficients of exp bins to come first.
+	replace profile_wexp = coef_mat[1,`num' - 1] if _n==`num' //accesing the first row, and `num' - 1 column of the matrix. This works since we put the coefficients of exp bins to come first.
 }
 replace profile_wexp = exp(profile_wexp) // converting to levels
 
@@ -134,7 +134,7 @@ use "Data\Temp\HLT_ConstrainedReg.dta"
 
 
 ** Experience
-replace plot_wexp = plot_wexp + 2.5 // This is the shift the point to the middle of the bins.
+replace plot_wexp = plot_wexp + 2.5 // This is to shift the points to the middle of the bins.
 
 twoway (scatter profile_wexp plot_wexp, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue)), ///
 xlabel(0(5)40,labsize(medium)) ylabel(0(1)3,labsize(medium)) 		/// 
@@ -146,7 +146,7 @@ title("Experience Effects",size(medlarge) color(black)) name(expeff, replace) xs
 gen coh_1920 = profile_coh[3]
 replace profile_coh = profile_coh/coh_1920
 
-replace plot_coh = plot_coh + 2.5 // This is the shift the point to the middle of the bins.
+replace plot_coh = plot_coh + 2.5 // This is to shift the point to the middle of the bins.
 
 twoway (scatter profile_coh plot_coh, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue)), ///
 xlabel(1910(10)1990,labsize(medsmall)) ylabel(0(1)4,labsize(medsmall)) 		/// 

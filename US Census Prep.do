@@ -2,6 +2,10 @@
 ** Using CPS data from (i) 1986-2013 (survey year), and (ii) 1962-2024 (survey year). 
 ** or (i) 1986 - 2012 and (ii) 1961 - 2023 (income year)
 
+** We will create two versions of dataset. 1. 1 is subtraced from year ("Uncorrected Age" sample); 2. 1 is subtraced from both year and age ("Corrected Age" sample). 
+
+///////// Let's start from the sample with uncorrected age ///////
+
 
 *** Preparing the data
 clear
@@ -13,8 +17,7 @@ use usa_census_smallest.dta
 replace perwt = expwtp if expwtp != .
 drop expwtp statefip
 
-* subtract 1 from year and age (since income variable is the income earned last year)
-*replace age = age - 1
+* subtract 1 from year (since income variable is the income earned last year)
 replace year = year - 1
 
 * drop those with weight < 0 (Note: These are valid weights)

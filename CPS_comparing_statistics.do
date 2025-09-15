@@ -1,7 +1,6 @@
-*** This do-file is for replicating the figures in Fang and Qiu (2023). 
-** Using CPS data from (i) 1986-2013 (survey year), and (ii) 1962-2024 (survey year). 
-** or (i) 1986 - 2012 and (ii) 1961 - 2023 (income year)
+*** This do-file is for examining the data preparation process by looking at the summary statistics of each variable in the dataset. ***
 
+** The version of the code here it the version that gives the same results as the dataset in the replication packgage. **
 
 *** Preparing the data
 clear

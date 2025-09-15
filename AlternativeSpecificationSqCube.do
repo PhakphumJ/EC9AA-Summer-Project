@@ -1,4 +1,4 @@
-*** This do-file is for the alternative specification where instead of using the full set of experience bin dummies, the squared and cubic of (experience - experience_bar) are included. 
+*** This do-file is for the alternative specification where instead of using the full set of experience bin dummies, the squared and cubic of (experience - \bar{experience}) are included.  
 
 ** We have three samples **
 * (i) CPS 1961 - 2023
@@ -19,7 +19,7 @@ keep if ybirth >= 1910 & ybirth <= 1994 // 17 cohorts.
 * We are not creating experience bins this time.
 keep if exp_baseline >= 0 & exp_baseline <= 39
 
-gen exp_bar = 35 // zero effects at exp_bar 
+gen exp_bar = 35 // zero effects at exp_bar, also zero derivative of the effects. 
 gen exp_sq = (exp_baseline - exp_bar)^2
 gen exp_cube = (exp_baseline - exp_bar)^3
 gen exp_quar = (exp_baseline - exp_bar)^4
@@ -56,14 +56,14 @@ foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from
 
 drop d_c* // to reduce memory usage.
 
-// gen time variable
+// gen time variable (We want 1961 to be 1.)
 gen year_rlb = year - 1960
 
 * Drop those with missing values
 drop if eduyrs == . | logrealwage == . | ybirth == .
 
 
-* Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
+* Normalizing the weights in each year -> mass of 1 in each year. 
 rename asecwt perwt
 bys year: egen tot_pers =sum(perwt)
 replace perwt = perwt/tot_pers			
@@ -87,7 +87,7 @@ gen plot_coh  = coho_min
 display `n_cohort'
 foreach num of numlist 2(1)`n_cohort'{
 	replace plot_coh  = plot_coh + (`num' - 1)*5 if _n == `num'
-} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+} // so for the second cohort bin, it is min_ybrith + 1*5. For the third cohort bin, it is min_ybirth + 2*5
 
 
 tab year
@@ -183,14 +183,14 @@ foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from
 
 drop d_c* // to reduce memory usage.
 
-// gen time variable
+// gen time variable (We want 1961 to be 1.)
 gen year_rlb = year - 1968
 
 * Drop those with missing values
 drop if eduyrs == . | logrealwage == . | ybirth == .
 
 
-* Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
+* Normalizing the weights in each year -> mass of 1 in each year. 
 bys year: egen tot_pers =sum(perwt)
 replace perwt = perwt/tot_pers			
 bys year: egen av_perwt = mean(perwt)
@@ -212,7 +212,7 @@ gen plot_coh  = coho_min
 display `n_cohort'
 foreach num of numlist 2(1)`n_cohort'{
 	replace plot_coh  = plot_coh + (`num' - 1)*5 if _n == `num'
-} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+} // so for the second cohort bin, it is min_ybrith + 1*5. For the third cohort bin, it is min_ybirth + 2*5
 
 // The years are 1969, 1979, 1989, 1999, 2000 - 2022 
 tab year
@@ -311,14 +311,14 @@ foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from
 
 drop d_c* // to reduce memory usage.
 
-// gen time variable
+// gen time variable (We want 1961 to be 1.)
 gen year_rlb = year - 1968
 
 * Drop those with missing values
 drop if eduyrs == . | logrealwage == . | ybirth == .
 
 
-* Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
+* Normalizing the weights in each year -> mass of 1 in each year. 
 rename asecwt perwt
 bys year: egen tot_pers =sum(perwt)
 replace perwt = perwt/tot_pers			
@@ -342,7 +342,7 @@ gen plot_coh  = coho_min
 display `n_cohort'
 foreach num of numlist 2(1)`n_cohort'{
 	replace plot_coh  = plot_coh + (`num' - 1)*5 if _n == `num'
-} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+} // so for the second cohort bin, it is min_ybrith + 1*5. For the third cohort bin, it is min_ybirth + 2*5
 
 * The years are 1969, 1979, 1989, 1999, 2000 - 2022
 tab year
@@ -439,14 +439,14 @@ foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from
 
 drop d_c* // to reduce memory usage.
 
-// gen time variable
+// gen time variable (We want 1961 to be 1.)
 gen year_rlb = year - 1960
 
 * Drop those with missing values
 drop if eduyrs == . | logrealwage == . | ybirth == .
 
 
-* Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
+* Normalizing the weights in each year -> mass of 1 in each year. 
 rename asecwt perwt
 bys year: egen tot_pers =sum(perwt)
 replace perwt = perwt/tot_pers			
@@ -470,7 +470,7 @@ gen plot_coh  = coho_min
 display `n_cohort'
 foreach num of numlist 2(1)`n_cohort'{
 	replace plot_coh  = plot_coh + (`num' - 1)*5 if _n == `num'
-} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+} // so for the second cohort bin, it is min_ybrith + 1*5. For the third cohort bin, it is min_ybirth + 2*5
 
 
 tab year
@@ -565,14 +565,14 @@ foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from
 
 drop d_c* // to reduce memory usage.
 
-// gen time variable
+// gen time variable (We want 1961 to be 1.)
 gen year_rlb = year - 1968
 
 * Drop those with missing values
 drop if eduyrs == . | logrealwage == . | ybirth == .
 
 
-* Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
+* Normalizing the weights in each year -> mass of 1 in each year. 
 bys year: egen tot_pers =sum(perwt)
 replace perwt = perwt/tot_pers			
 bys year: egen av_perwt = mean(perwt)
@@ -594,7 +594,7 @@ gen plot_coh  = coho_min
 display `n_cohort'
 foreach num of numlist 2(1)`n_cohort'{
 	replace plot_coh  = plot_coh + (`num' - 1)*5 if _n == `num'
-} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+} // so for the second cohort bin, it is min_ybrith + 1*5. For the third cohort bin, it is min_ybirth + 2*5
 
 // The years are 1969, 1979, 1989, 1999, 2000 - 2022 
 tab year
@@ -693,14 +693,14 @@ foreach num of numlist 1(1)`n_cohort'{ //(use the `n_cohort' list, starting from
 
 drop d_c* // to reduce memory usage.
 
-// gen time variable
+// gen time variable (We want 1961 to be 1.)
 gen year_rlb = year - 1968
 
 * Drop those with missing values
 drop if eduyrs == . | logrealwage == . | ybirth == .
 
 
-* Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
+* Normalizing the weights in each year -> mass of 1 in each year. 
 rename asecwt perwt
 bys year: egen tot_pers =sum(perwt)
 replace perwt = perwt/tot_pers			
@@ -724,7 +724,7 @@ gen plot_coh  = coho_min
 display `n_cohort'
 foreach num of numlist 2(1)`n_cohort'{
 	replace plot_coh  = plot_coh + (`num' - 1)*5 if _n == `num'
-} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+} // so for the second cohort bin, it is min_ybrith + 1*5. For the third cohort bin, it is min_ybirth + 2*5
 
 * The years are 1969, 1979, 1989, 1999, 2000 - 2022
 tab year

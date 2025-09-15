@@ -6,6 +6,7 @@
 
 /////////////////////////////////
 /// Alternative Specification (Deaton-Hall with polynomials in potential experience) ///
+*** Both cubic and Quartic ***
 
 **** First we need to prepare data for plotting ****
 /// Sample 1
@@ -433,7 +434,7 @@ replace profile_coh_sam1_Cr_cubic = profile_coh_sam1_Cr_cubic/coh_1920_sam1_Cr_c
 replace profile_coh_sam1_UnCr_quartic = profile_coh_sam1_UnCr_quartic/coh_1920_sam1_UnCr_quartic
 replace profile_coh_sam1_Cr_quartic = profile_coh_sam1_Cr_quartic/coh_1920_sam1_Cr_quartic
 
-replace plot_coh = plot_coh + 2.5 // This is the shift the point to the middle of the bins.
+replace plot_coh = plot_coh + 2.5 // This is to shift the point to the middle of the bins.
 
 *** Cubic ***
 twoway (scatter profile_coh_sam1_UnCr_cubic plot_coh, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue))		/// 

@@ -1,8 +1,8 @@
-*** This do-file is for replicating the figures in Fang and Qiu (2023). 
-** Using CPS data from (i) 1986-2013 (survey year), and (ii) 1962-2024 (survey year). 
-** or (i) 1986 - 2012 and (ii) 1961 - 2023 (income year)
+*** This do-file is cleaning the CPS to be ready for making it into Sample 1, 2, and 3. And also ready to for the decomposition.
 
+** We will create two versions of CPS. 1. 1 is subtraced from year ("Uncorrected Age" sample); 2. 1 is subtraced from both year and age ("Corrected Age" sample). 
 
+///////// Let's start from the sample with uncorrected age ///////
 *** Preparing the data
 clear
 cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data"
@@ -14,8 +14,7 @@ drop serial month cpsid asecflag hflag statecensus pernum cpsidp cpsidv asecwth
 * drop irrelevant variables (for this exercise)
 drop race marst occ ind inctot incbus incfarm inclongj oincbus oincfarm oincwage empstat labforce uhrsworkt statefip
 
-* subtract 1 from year and age (since income variable is the income earned last year)
-*replace age = age - 1
+* subtract 1 from and age (since income variable is the income earned last year)
 replace year = year - 1
 
 * count obs b/w 1986 - 2012
@@ -101,11 +100,8 @@ count if year >= 1986 & year <= 2012 // I expect to have 2,238,116 obs. Got the 
 ** Export the data
 save "CPS_Cleaned_UnCr.dta", replace 
 
-
+////////////////////////////////////////////////////////////////////////////////
 //// Below is for creating the dataset with corrected age variable (age = age - 1). 
-*** This do-file is for replicating the figures in Fang and Qiu (2023). 
-** Using CPS data from (i) 1986-2013 (survey year), and (ii) 1962-2024 (survey year). 
-** or (i) 1986 - 2012 and (ii) 1961 - 2023 (income year)
 
 
 *** Preparing the data

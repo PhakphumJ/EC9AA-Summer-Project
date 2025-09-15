@@ -1,5 +1,9 @@
-*** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4) ***
-** Using Census Data **
+*** This is the code for doing the decomposition using the alternative specification *** Implement through the iterative algorithm used for the baseline specification. ** Cubic polynomials; Sample 2.
+
+// Let's start with the uncorrected age version. //
+********************************************************************************
+* 1. Data Preparation
+********************************************************************************
 clear
 cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
 use "Data\US_Census_Cleaned_UnCr.dta"
@@ -10,12 +14,12 @@ rename birthyr ybirth
 keep if year >= 1969 & year <= 2022
 keep if ybirth >= 1920 & ybirth <= 1994 // 15 cohorts.
 
-* gen exp bins
+* gen exp bins (Only use for getting the initial growth rate.)
 egen wexp_group = cut(exp_baseline), at(0(5)40) // working life = 40 yrs old. Incrementing from 0 by 5 each step.
 
 drop if wexp_group == . // use only those in interested experience groups (no negative experience or over 40 years)
 
-* We are not creating experience bins this time.
+* Create polynomial terms
 keep if exp_baseline >= 0 & exp_baseline <= 39
 
 gen exp_bar = 0 // zero yhat at exp_bar 
@@ -82,17 +86,14 @@ drop d_t* // to reduce memory usage.
 drop if wexp_group == . | eduyrs == . | logrealwage == . | ybirth == .
 drop eduyrs
 
-* Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
+* Normalizing the weights in each year -> mass of 1 in each year. 
 bys year: egen tot_pers =sum(perwt)
 replace perwt = perwt/tot_pers			
 drop tot_pers
 
 ********************************************************************************
-* 1. PARAMETERS 
+* 2. PARAMETERS 
 ********************************************************************************
-global medreg 0			// whether perform median regression or not
-global ctrledu 0		// whether control education or not
-global min_obs 0		// set minumum number of observations in each year/experience bin. (Suggested 10 or >)
 global max_iter 50 		// maximum number of iteration (to stop if algorithm does not convergence)
 global precision 0.0001 // percentage gap between growth rates at convergence. 
 global dump 0.7 		// dumping factor useful to achieve convergence. Should be not too small relative to precision, or you get fake convergence. 
@@ -213,7 +214,7 @@ while `diff' > $precision & `iter' < $max_iter{
 	replace profile_year = (psi - fi)/(s_y[1]) if _n == 2
 	
 	* Next, check wheter we manage to make flat spot assumption holds.
-	* Extract the experience effect in the Last Ten Years (for baseline assumption, exp effect in the 6th, 7th, and 8th bins should be the same) (*** I don't like how they did this. Since, they are using only the begining and the end of the flat parts. -> Produce a hump in the middle.)
+	* Extract the experience effect in the Last Ten Years (we want the average growth rate of experience effects in the last ten years to be close to zero)
 	summarize profile_wexp if profile_wexp_plot == $flat_end, meanonly
 	local wexp_high_scal = r(mean)
 	
@@ -276,7 +277,7 @@ local n_coho = coho_gap[1]/$bin_coh + 1
 display `n_coho'
 foreach num of numlist 2(1)`n_coho'{
 	replace plot_coh  = plot_coh + (`num' - 1)*$bin_coh if _n == `num'
-} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+} // so for the second cohort bin, it is min_ybrith + 1*5. For the third cohort bin, it is min_ybirth + 2*5
 
 gen plot_wexp = profile_wexp_plot
 
@@ -292,6 +293,9 @@ save "Data\Temp\HLT_results_sample2_UnCr_AltSpec_cubic.dta", replace
 ////////////////////////////////////////////
 ///// The Below is for doing the same thing but using the dataset with corrected age variable. ///
 
+********************************************************************************
+* 1. Data Preparation
+********************************************************************************
 clear
 cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
 use "Data\US_Census_Cleaned_Cr.dta"
@@ -302,12 +306,12 @@ rename birthyr ybirth
 keep if year >= 1969 & year <= 2022
 keep if ybirth >= 1920 & ybirth <= 1994 // 15 cohorts.
 
-* gen exp bins
+* gen exp bins (Only use for getting the initial growth rate.)
 egen wexp_group = cut(exp_baseline), at(0(5)40) // working life = 40 yrs old. Incrementing from 0 by 5 each step.
 
 drop if wexp_group == . // use only those in interested experience groups (no negative experience or over 40 years)
 
-* We are not creating experience bins this time.
+* Create polynomial terms
 keep if exp_baseline >= 0 & exp_baseline <= 39
 
 gen exp_bar = 0 // zero yhat at exp_bar 
@@ -374,17 +378,14 @@ drop d_t* // to reduce memory usage.
 drop if wexp_group == . | eduyrs == . | logrealwage == . | ybirth == .
 drop eduyrs
 
-* Normalizing the weights in each year -> mass of 1 in each year. (Is this a proper thing to do?)
+* Normalizing the weights in each year -> mass of 1 in each year. 
 bys year: egen tot_pers =sum(perwt)
 replace perwt = perwt/tot_pers			
 drop tot_pers
 
 ********************************************************************************
-* 1. PARAMETERS 
+* 2. PARAMETERS 
 ********************************************************************************
-global medreg 0			// whether perform median regression or not
-global ctrledu 0		// whether control education or not
-global min_obs 0		// set minumum number of observations in each year/experience bin. (Suggested 10 or >)
 global max_iter 50 		// maximum number of iteration (to stop if algorithm does not convergence)
 global precision 0.0001 // percentage gap between growth rates at convergence. 
 global dump 0.7 		// dumping factor useful to achieve convergence. Should be not too small relative to precision, or you get fake convergence. 
@@ -505,7 +506,7 @@ while `diff' > $precision & `iter' < $max_iter{
 	replace profile_year = (psi - fi)/(s_y[1]) if _n == 2
 	
 	* Next, check wheter we manage to make flat spot assumption holds.
-	* Extract the experience effect in the Last Ten Years (for baseline assumption, exp effect in the 6th, 7th, and 8th bins should be the same) (*** I don't like how they did this. Since, they are using only the begining and the end of the flat parts. -> Produce a hump in the middle.)
+	* Extract the experience effect in the Last Ten Years (we want the average growth rate of experience effects in the last ten years to be close to zero)
 	summarize profile_wexp if profile_wexp_plot == $flat_end, meanonly
 	local wexp_high_scal = r(mean)
 	
@@ -568,7 +569,7 @@ local n_coho = coho_gap[1]/$bin_coh + 1
 display `n_coho'
 foreach num of numlist 2(1)`n_coho'{
 	replace plot_coh  = plot_coh + (`num' - 1)*$bin_coh if _n == `num'
-} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+} // so for the second cohort bin, it is min_ybrith + 1*5. For the third cohort bin, it is min_ybirth + 2*5
 
 gen plot_wexp = profile_wexp_plot
 

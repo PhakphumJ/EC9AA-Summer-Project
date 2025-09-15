@@ -1,4 +1,4 @@
-*** This file is cleaning the dataset in the way I did it initially (incorrect way of creating outlier flag, subtract 1 from both year and age)
+*** This file is for cleaning the dataset in the way I did it initially (incorrect way of creating outlier flag, and subtract 1 from both year and age). This is mainly for illustration purpose.
 
 *** Preparing the data
 clear

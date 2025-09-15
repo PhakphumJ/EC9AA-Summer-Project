@@ -1,6 +1,10 @@
-*** This is the code for doing the baselinse HLT decomposition *** (for producing figure 4) ***
-** But, now use the whole available periods of CPS data (1961 - 2023).
+*** This is the code for doing the baselinse HLT decomposition, using Sample 1 (All available CPS periods).*** 
+** The code is based on the code provided by Fang and Qiu (2023) and Lagakos et al. (2018) **
 
+// Let's start with the uncorrected age version. //
+********************************************************************************
+* 1. Data Preparation
+********************************************************************************
 clear
 cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
 use "Data\CPS_Cleaned_UnCr.dta"
@@ -77,11 +81,8 @@ bys year: egen tot_pers =sum(perwt)
 replace perwt = perwt/tot_pers			
 bys year: egen av_perwt = mean(perwt)
 ********************************************************************************
-* 1. PARAMETERS 
+* 2. PARAMETERS 
 ********************************************************************************
-global medreg 0			// whether perform median regression or not
-global ctrledu 0		// whether control education or not
-global min_obs 0		// set minumum number of observations in each year/experience bin. (Suggested 10 or >)
 global max_iter 50 		// maximum number of iteration (to stop if algorithm does not convergence)
 global precision 0.0001 // percentage gap between growth rates at convergence. 
 global dump 0.7 		// dumping factor useful to achieve convergence. Should be not too small relative to precision, or you get fake convergence. 
@@ -222,7 +223,7 @@ while `diff' > $precision & `iter' < $max_iter{
 	replace profile_year = (psi - fi)/(s_y[1]) if _n == 2
 	
 	* Next, check wheter we manage to make flat spot assumption holds.
-	* Extract the experience effect in the Last Ten Years (for baseline assumption, exp effect in the 6th, 7th, and 8th bins should be the same) (*** I don't like how they did this. Since, they are using only the begining and the end of the flat parts. -> Produce a hump in the middle.)
+	* Extract the experience effect in the Last Ten Years (we want the average growth rate of experience effects in the last ten years to be close to zero)
 	replace wexp_high = profile_wexp[$flat_end]
 	replace wexp_low = profile_wexp[$flat_start]
 	local flat_length = ($flat_end - $flat_start)*5 //number of years in the flat part.
@@ -272,7 +273,7 @@ local n_coho = coho_gap[1]/$bin_coh + 1
 display `n_coho'
 foreach num of numlist 2(1)`n_coho'{
 	replace plot_coh  = plot_coh + (`num' - 1)*$bin_coh if _n == `num'
-} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+} // so for the second cohort bin, it is min_ybrith + 1*5. For the third cohort bin, it is min_ybirth + 2*5
 
 gen plot_wexp = (_n-1)*$bin_wexp // i.e. 0,5,10,15,...
 replace plot_wexp = . if plot_wexp >= $max_wexp // keeping only 0-35
@@ -289,7 +290,9 @@ save "Data\Temp\HLT_results_sample1_UnCr.dta", replace
 ////////////////////////////////////////////
 ///// The Below is for doing the same thing but using the dataset with corrected age variable. ///
 
-
+********************************************************************************
+* 1. Data Preparation
+********************************************************************************
 clear
 cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project"
 use "Data\CPS_Cleaned_Cr.dta"
@@ -366,11 +369,8 @@ bys year: egen tot_pers =sum(perwt)
 replace perwt = perwt/tot_pers			
 bys year: egen av_perwt = mean(perwt)
 ********************************************************************************
-* 1. PARAMETERS 
+* 2. PARAMETERS 
 ********************************************************************************
-global medreg 0			// whether perform median regression or not
-global ctrledu 0		// whether control education or not
-global min_obs 0		// set minumum number of observations in each year/experience bin. (Suggested 10 or >)
 global max_iter 50 		// maximum number of iteration (to stop if algorithm does not convergence)
 global precision 0.0001 // percentage gap between growth rates at convergence. 
 global dump 0.7 		// dumping factor useful to achieve convergence. Should be not too small relative to precision, or you get fake convergence. 
@@ -380,29 +380,6 @@ global bin_wexp 5		// length of experience bins
 global max_wexp 40		// maximum years of experience of interest [should be multiple of $bin_coh]
 global flat_start 6		// starting point for flat spot (the 7th and 8th bins)
 global flat_end 8		// ending point for flat spot
-
-********************************************************************************
-* 2. Creating temp variables for checking num. of obs. before running the algo. 
-********************************************************************************
-
-* Check that there is sufficient number of observations in each year-experience bin
-*** (1) the minimal number of observations among all year-experience bins > $min_obs
-gen one_temp = 1
-sort year wexp_group
-egen group_temp = group(year wexp_group) // create pair numbers (year-experience bin pairs)
-bysort group_temp: egen bin_obs_temp = sum(one_temp)	// bin_obs_temp: number of observations in each year-experience bin
-egen bin_obs_temp_min = min(bin_obs_temp)			// bin_obs_temp_min: the minimal number of observations among all year-experience bins
-
-*** (2) number of experience groups
-tab wexp_group
-local num_wexp = r(r)								// `num_wexp': number of experience groups
-
-*** (3) number of experience groups per year
-tab year
-local n_year = r(r)
-tab group_temp
-local n_group = r(r)
-local n_wexp_per_year = `n_group' / `n_year'
 
 
 ********************************************************************************
@@ -511,7 +488,7 @@ while `diff' > $precision & `iter' < $max_iter{
 	replace profile_year = (psi - fi)/(s_y[1]) if _n == 2
 	
 	* Next, check wheter we manage to make flat spot assumption holds.
-	* Extract the experience effect in the Last Ten Years (for baseline assumption, exp effect in the 6th, 7th, and 8th bins should be the same) (*** I don't like how they did this. Since, they are using only the begining and the end of the flat parts. -> Produce a hump in the middle.)
+	* Extract the experience effect in the Last Ten Years (we want the average growth rate of experience effects in the last ten years to be close to zero)
 	replace wexp_high = profile_wexp[$flat_end]
 	replace wexp_low = profile_wexp[$flat_start]
 	local flat_length = ($flat_end - $flat_start)*5 //number of years in the flat part.
@@ -561,7 +538,7 @@ local n_coho = coho_gap[1]/$bin_coh + 1
 display `n_coho'
 foreach num of numlist 2(1)`n_coho'{
 	replace plot_coh  = plot_coh + (`num' - 1)*$bin_coh if _n == `num'
-} // so for the second cohort, it is the min_ybrith + 1*5. For second cohort, it is min_ybirth + 2*5
+} // so for the second cohort bin, it is min_ybrith + 1*5. For the third cohort bin, it is min_ybirth + 2*5
 
 gen plot_wexp = (_n-1)*$bin_wexp // i.e. 0,5,10,15,...
 replace plot_wexp = . if plot_wexp >= $max_wexp // keeping only 0-35

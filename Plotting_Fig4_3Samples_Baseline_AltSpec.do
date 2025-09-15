@@ -180,7 +180,7 @@ save "Data\Temp\HLT_results_all_sample_time_profile.dta", replace
 clear
 use "Data\Temp\HLT_results_all_sample_exp_profile.dta"
 
-replace plot_wexp = plot_wexp + 2.5 // This is the shift the point to the middle of the bins.
+replace plot_wexp = plot_wexp + 2.5 // This is to shift the point to the middle of the bins.
 twoway (scatter profile_wexp_sam1_basel_UnCr plot_wexp, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue))		/// 
 (scatter profile_wexp_sam1_basel_Cr plot_wexp, msymbol(th) mcolor(blue) msize(small) connect(l) lcolor(blue) lpattern(dash)) ///  
 (scatter profile_wexp_sam2_basel_UnCr plot_wexp, msymbol(dh) mcolor(emerald) msize(small) connect(l) lcolor(emerald))		/// 
@@ -202,7 +202,7 @@ gen coh_1920_sample1_Cr = profile_coh_sam1_basel_Cr[3]
 replace profile_coh_sam1_basel_UnCr = profile_coh_sam1_basel_UnCr/coh_1920_sample1_UnCr
 replace profile_coh_sam1_basel_Cr = profile_coh_sam1_basel_Cr/coh_1920_sample1_Cr
 
-replace plot_coh = plot_coh + 2.5 // This is the shift the point to the middle of the bins.
+replace plot_coh = plot_coh + 2.5 // This is to shift the point to the middle of the bins.
 twoway (scatter profile_coh_sam1_basel_UnCr plot_coh, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue))		/// 
 (scatter profile_coh_sam1_basel_Cr plot_coh, msymbol(th) mcolor(blue) msize(small) connect(l) lcolor(blue) lpattern(dash)) ///  
 (scatter profile_coh_sam2_basel_UnCr plot_coh, msymbol(dh) mcolor(emerald) msize(small) connect(l) lcolor(emerald))		/// 
@@ -258,6 +258,7 @@ graph export "Figs\Fig4_3Samples_Baseline.jpg", replace
 
 /////////////////////////////////
 /// Alternative Specification ///
+/// Card's Approach ///
 
 **** First we need to prepare data for plotting ****
 // Sample 1
@@ -463,7 +464,7 @@ gen coh_1920_sample1_Cr = profile_coh_sam1_altsp_Cr[3]
 replace profile_coh_sam1_altsp_UnCr = profile_coh_sam1_altsp_UnCr/coh_1920_sample1_UnCr
 replace profile_coh_sam1_altsp_Cr = profile_coh_sam1_altsp_Cr/coh_1920_sample1_Cr
 
-replace plot_coh = plot_coh + 2.5 // This is the shift the point to the middle of the bins.
+replace plot_coh = plot_coh + 2.5 // This is to shift the point to the middle of the bins.
 twoway (scatter profile_coh_sam1_altsp_UnCr plot_coh, msymbol(dh) mcolor(blue) msize(small) connect(l) lcolor(blue))		/// 
 (scatter profile_coh_sam1_altsp_Cr plot_coh, msymbol(th) mcolor(blue) msize(small) connect(l) lcolor(blue) lpattern(dash)) ///  
 (scatter profile_coh_sam2_altsp_UnCr plot_coh, msymbol(dh) mcolor(emerald) msize(small) connect(l) lcolor(emerald))		/// 

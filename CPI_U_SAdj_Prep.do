@@ -1,8 +1,8 @@
-** This do-file is for cleaning CPI data
+** This do-file is for cleaning CPI data, the CPI-U seasonally adjusted from 1947 to 2024 obtained from FRED ** 
 
 clear
 cd "C:\Users\fphak\OneDrive - University of Warwick\Warwick PhD\Academic\EC9AA Summer Project\Data"
-* Extract only the year
+* Extract only the year, not the dates or months.
 import delimited "CPIAUCSL_NBD20150101_1947_to_2024.csv"
 gen year = substr(observation_date ,1,4)
 destring year, replace

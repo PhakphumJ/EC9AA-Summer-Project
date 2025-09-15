@@ -1,4 +1,5 @@
-***** This do-file is for plotting the results of the composition. *****
+***** This do-file is for plotting the results of the composition to check whether we manage to replicate Fang and Qiu (2023)'s results *****
+**** !!! But now use the dataset with uncorrected age and the same way to construct the outlier flag. ****
 
 *** First, I would like to compare the results of the decomposition using
 * (i) the papar's results.
@@ -6,7 +7,7 @@
 * (iii) the dataset I cleaned myself and the algorithm I coded
 ** The data are from 1986 - 2012.
 
-*** !!! But now use the dataset with uncorrected age and the same way to construct the outlier flag.
+
 
 ** Merge the three datasets containing the results. Can do this using plot_year as the key variable. Want to bring in profile_wexp, profile_coh, and profile_year.
 
@@ -53,7 +54,7 @@ merge 1:1 plot_year using "Data\Temp\HLT_results_all_self_profile_Final.dta", ke
 *** Plotting ***
 ** Experience **
 
-replace plot_wexp = plot_wexp + 2.5 // This is the shift the point to the middle of the bins.
+replace plot_wexp = plot_wexp + 2.5 // This is to shift the point to the middle of the bins.
 
 twoway (scatter profile_wexp_all_orig plot_wexp, msymbol(dh) mcolor(blue) msize(large) connect(l) lcolor(blue)) ///
 	(scatter profile_wexp_self_data_orig_algo plot_wexp, msymbol(oh) mcolor(red) msize(large) connect(l) lcolor(red)) /// 
@@ -66,7 +67,7 @@ twoway (scatter profile_wexp_all_orig plot_wexp, msymbol(dh) mcolor(blue) msize(
 	
 ** Cohort **
 
-replace plot_coh = plot_coh + 2.5 // This is the shift the point to the middle of the bins.
+replace plot_coh = plot_coh + 2.5 // This is to shift the point to the middle of the bins.
 
 twoway (scatter profile_coh_all_orig plot_coh, msymbol(dh) mcolor(blue) msize(large) connect(l) lcolor(blue)) ///
 	(scatter profile_coh_self_data_orig_algo plot_coh, msymbol(oh) mcolor(red) msize(large) connect(l) lcolor(red)) /// 
